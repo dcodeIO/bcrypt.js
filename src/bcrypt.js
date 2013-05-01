@@ -432,6 +432,19 @@
     }
 
     /**
+     * Continues with the callback on the next tick.
+     * @param {function(...[*])} callback Callback to execute
+     * @private
+     */
+    function _nextTick(callback) {
+        if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
+            process.nextTick(callback);
+        } else {
+            setTimeout(callback, 0);
+        }
+    }
+
+    /**
      * Internaly crypts a string.
      * @param {Array.<number>} b Bytes to crypt
      * @param {Array.<number>} salt Salt bytes to use
@@ -497,7 +510,7 @@
                 }
             }
             if (callback) {
-                process.nextTick(next);
+                _nextTick(next);
             }
             return null;
         }
@@ -677,7 +690,7 @@
         if (typeof callback != 'function') {
             throw(new Error("Illegal or missing 'callback': "+callback));
         }
-        process.nextTick(function() { // Pretty thin, but salting is fast enough
+        _nextTick(function() { // Pretty thin, but salting is fast enough
             try {
                 var res = bcrypt.genSaltSync(rnd);
                 callback(null, res);
