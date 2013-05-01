@@ -63,3 +63,24 @@ var crypto = {};
  * @returns {Array.<number>}
  */
 crypto.randomBytes = function(n) {};
+
+/**
+ * @type {Object.<string,*>}
+ */
+window.crypto = {};
+
+/**
+ * @param {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array} array
+ */
+window.crypto.getRandomValues = function(array) {};
+
+/**
+ * @param {string} name
+ * @param {function(...[*]):*} constructor
+ */
+var define = function(name, constructor) {};
+
+/**
+ * @type {boolean}
+ */
+define.amd;

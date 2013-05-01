@@ -31,9 +31,7 @@
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/bcrypt.js for details
  */
-module.exports = (function() {
-
-    var crypto = require("crypto");
+(function(global) {
 
     /**
      * @type {Array.<string>}
@@ -158,7 +156,7 @@ module.exports = (function() {
             res.push(rs[off].charCodeAt(0));
         }
         return res;
-    };
+    };    
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -723,6 +721,26 @@ module.exports = (function() {
     }
 
     /**
+     * Generates cryptographically secure random bytes.
+     * @param {number} len Number of bytes to generate
+     * @returns {Array.<number>}
+     * @private
+     */
+    function _randomBytes(len) {
+        // node.js, see: http://nodejs.org/api/crypto.html
+        if (typeof module !== 'undefined' && module.exports) {
+            var crypto = require("crypto");
+            return crypto.randomBytes(len);
+            
+        // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
+        } else {
+            var array = new Uint32Array(len);
+            window.crypto.getRandomValues(array);
+            return Array.prototype.slice.call(array);
+        }
+    }
+
+    /**
      * Internally generates a salt.
      * @param {number} rounds Number of rounds to use
      * @returns {string} Salt
@@ -740,7 +758,7 @@ module.exports = (function() {
         salt.push(rounds.toString());
         salt.push('$');
         try {
-            salt.push(base64.encode(crypto.randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
+            salt.push(base64.encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
             return salt.join('');
         } catch(err) {
             throw(err);
@@ -902,8 +920,18 @@ module.exports = (function() {
         }
         return hash.substring(0, 29);
     };
+
+    // Enable module loading if available
+    if (typeof module != 'undefined' && module["exports"]) { // CommonJS
+        module["exports"] = bcrypt;
+    } else if (typeof define != 'undefined' && define["amd"]) { // AMD
+        define("bcrypt", function() { return bcrypt; });
+    } else { // Shim
+        if (!global["dcodeIO"]) {
+            global["dcodeIO"] = {};
+        }
+        global["dcodeIO"]["bcrypt"] = bcrypt;
+    }
     
-    return bcrypt;
-    
-})();
+})(this);
 

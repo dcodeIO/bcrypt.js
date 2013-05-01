@@ -1,7 +1,48 @@
 ![bcrypt.js - bcrypt in plain JavaScript](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
 ===========
 Optimized bcrypt in plain JavaScript with zero dependencies. Compiled through Closure Compiler using advanced
-optimizations, 100% typed code. Fully compatible to [bcrypt](https://npmjs.org/package/bcrypt).
+optimizations, 100% typed code. Fully compatible to [bcrypt](https://npmjs.org/package/bcrypt) and also working in the
+browser.
+
+Features
+--------
+* CommonJS/node.js compatible (via [crypto](http://nodejs.org/api/crypto.html)), also available via [npm](https://npmjs.org/package/bcryptjs) 
+* Shim/browser compatible (via [WebCryptoAPI](http://www.w3.org/TR/WebCryptoAPI))
+* RequireJS/AMD compatible
+* Zero production dependencies
+* Small footprint
+
+Usage
+-----
+
+#### node.js
+`npm install bcryptjs`
+
+```javascript
+var bcrypt = require('bcryptjs');
+...
+```
+
+#### RequireJS/AMD
+```javascript
+require.config({
+    "paths": {
+        "bcrypt": "/path/to/bcrypt.js"
+    }
+});
+require(["bcrypt"], function(bcrypt) {
+    ...
+});
+```
+
+#### Shim/browser
+```html
+<script src="//raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.min.js"></script>
+```
+```javascript
+var bcrypt = dcodeIO.bcrypt;
+...
+```
 
 Usage - Sync
 ------------
