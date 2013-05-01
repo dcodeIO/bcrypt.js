@@ -24,9 +24,7 @@
         "authentication",
         "encryption",
         "crypt",
-        "crypto",
-        "native",
-        "dojo"
+        "crypto"
     ],
     "main": "./bcrypt.min.js",
     "dependencies": {},
