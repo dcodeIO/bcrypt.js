@@ -11,6 +11,7 @@ Features
 * RequireJS/AMD compatible
 * Zero production dependencies
 * Small footprint
+* Closure Compiler [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
 
 Usage
 -----

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Minimal environment for dojo-bcrypt.
+ * @fileoverview Minimal environment for bcrypt.js.
  * @externs
  */
 
