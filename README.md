@@ -205,6 +205,11 @@ Command line
 
 If the input got spaces inside, simply surround it with quotes.
 
+Downloads
+---------
+* [ZIP-Archive](https://github.com/dcodeIO/bcrypt.js/archive/master.zip)
+* [Tarball](https://github.com/dcodeIO/bcrypt.js/tarball/master)
+
 Credits
 -------
 Based on work started by Shane Girish at [bcrypt-nodejs](https://github.com/shaneGirish/bcrypt-nodejs) (MIT-licensed),
