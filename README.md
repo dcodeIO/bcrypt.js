@@ -8,7 +8,7 @@ Usage - Sync
 To hash a password: 
 
 ```javascript
-var bcrypt = require('dojo-bcrypt');
+var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0/\/", salt);
 // Store hash in your password DB.
@@ -33,7 +33,7 @@ Usage - Async
 To hash a password: 
 
 ```javascript
-var bcrypt = require('dojo-bcrypt');
+var bcrypt = require('bcryptjs');
 bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash("B4c0/\/", salt, function(err, hash) {
         // Store hash in your password DB.

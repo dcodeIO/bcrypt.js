@@ -12,10 +12,10 @@
     ],
     "repository": {
         "type": "url",
-        "url": "https://github.com/dcodeIO/dojo.git"
+        "url": "https://github.com/dcodeIO/bcrypt.js.git"
     },
     "bugs": {
-        "url": "https://github.com/dcodeIO/dojo/issues"
+        "url": "https://github.com/dcodeIO/bcrypt.js/issues"
     },
     "keywords": [
         "bcrypt",
