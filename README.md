@@ -1,7 +1,7 @@
 ![bcrypt.js - bcrypt in plain JavaScript](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
 ===========
-Optimized bcrypt in plain JavaScript with zero dependencies. Compiled through Closure Compiler on advanced optimizations,
-100% typed code. Fully compatible to [bcrypt](https://npmjs.org/package/bcrypt).
+Optimized bcrypt in plain JavaScript with zero dependencies. Compiled through Closure Compiler using advanced
+optimizations, 100% typed code. Fully compatible to [bcrypt](https://npmjs.org/package/bcrypt).
 
 Usage - Sync
 ------------
