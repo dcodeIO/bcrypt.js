@@ -4,7 +4,7 @@ Optimized bcrypt in plain JavaScript with zero dependencies. Compiled through Cl
 optimizations, 100% typed code. Fully compatible to [bcrypt](https://npmjs.org/package/bcrypt) and also working in the
 browser.
 
-Features
+Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=master)
 --------
 * CommonJS/node.js compatible (via [crypto](http://nodejs.org/api/crypto.html)), also available via [npm](https://npmjs.org/package/bcryptjs) 
 * Shim/browser compatible (via [WebCryptoAPI](http://www.w3.org/TR/WebCryptoAPI))
