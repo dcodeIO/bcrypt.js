@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies. 100% typed code. Fully compatible to 'bcrypt'.",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "contributors": [
         "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",
@@ -29,13 +29,13 @@
     "main": "./bcrypt.min.js",
     "dependencies": {},
     "devDependencies": {
-        "dojo-test": "0.1.x",
+        "testjs": "latest",
         "preprocessor": "latest",
         "closurecompiler": "latest"
     },
     "license": "Apache-2.0",
     "scripts": {
-        "test": "aladojo",
+        "test": "testjs",
         "build": "preprocess ./src/bcrypt.js ./src > ./bcrypt.js",
         "compile": "ccjs bcrypt.js --warning_level=VERBOSE --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js > bcrypt.min.js",
         "make": "npm run-script build && npm run-script compile && npm test"
