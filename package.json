@@ -35,7 +35,7 @@
     },
     "license": "Apache-2.0",
     "scripts": {
-        "test": "testjs tests/suite.js",
+        "test": "node node_modules/testjs/bin/testjs",
         "build": "preprocess ./src/bcrypt.js ./src > ./bcrypt.js",
         "compile": "ccjs bcrypt.js --warning_level=VERBOSE --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js > bcrypt.min.js",
         "make": "npm run-script build && npm run-script compile && npm test"
