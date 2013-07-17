@@ -652,6 +652,20 @@
         }
     }
 
+    function _stringToBytes ( str ) {
+        var ch, st, re = [];
+        for (var i = 0; i < str.length; i++ ) {
+            ch = str.charCodeAt(i);
+            st = [];
+            do {
+                st.push( ch & 0xFF );
+                ch = ch >> 8;
+            } while (ch);
+            re = re.concat( st.reverse() );
+        }
+        return re;
+    }
+
     /**
      * Internally hashes a string.
      * @param {string} s String to hash
@@ -689,12 +703,8 @@
         var real_salt = salt.substring(offset + 3, offset + 25);
         s += minor >= 'a' ? "\000" : "";
 
-        var buf = new Buffer(s); // TODO (dcode): What is this good for? Getting bytes?
-        var passwordb = [];
+        var passwordb = _stringToBytes(s);
         var saltb = [];
-        for (var r=0; r<buf.length; r++) {
-            passwordb.push(buf[r]);
-        }
         saltb = base64.decode(real_salt, BCRYPT_SALT_LEN);
 
         /**
