@@ -636,7 +636,7 @@
         // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
         } else {
             var array = new Uint32Array(len);
-            window.crypto.getRandomValues(array);
+            global.window.crypto.getRandomValues(array);
             return Array.prototype.slice.call(array);
         }
     }
