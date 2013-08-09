@@ -516,10 +516,10 @@
         }
 
         // Async
-        if (typeof callback != 'undefined') {
+        if (typeof callback !== 'undefined') {
             next();
             return null;
-            // Sync
+         // Sync
         } else {
             var res;
             while (true) {
@@ -636,7 +636,13 @@
         // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
         } else {
             var array = new Uint32Array(len);
-            global.crypto.getRandomValues(array); // Maybe use a polyfill
+            if (global.crypto && typeof global.crypto.getRandomValues === 'function') {
+                global.crypto.getRandomValues(array);
+            } else if (typeof _getRandomValues === 'function') {
+                _getRandomValues(array);
+            } else {
+                throw(new Error("Failed to generate random values: Web Crypto API not available / no polyfill set"));
+            }
             return Array.prototype.slice.call(array);
         }
     }
@@ -665,6 +671,16 @@
             throw(err);
         }
     }
+    
+    var _getRandomValues = null;
+
+    /**
+     * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
+     * @param {function(Uint32Array)} getRandomValues The actual implementation
+     */
+    bcrypt.setRandomPolyfill = function(getRandomValues) {
+        _getRandomValues = getRandomValues;
+    };
 
     /**
      * Synchronously generates a salt.
