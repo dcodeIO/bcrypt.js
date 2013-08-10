@@ -26,6 +26,11 @@
 var bcrypt = {};
 
 /**
+ * @param {Uint32Array} array
+ */
+bcrypt.setRandomPolyfill = function(array) {};
+
+/**
  * @param {number=} rounds
  * @param {number=} seed_length
  * @returns {string}

@@ -794,11 +794,13 @@
         }
     }
     
+    // crypto.getRandomValues polyfill to use
     var _getRandomValues = null;
-
+    
     /**
      * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
      * @param {function(Uint32Array)} getRandomValues The actual implementation
+     * @expose
      */
     bcrypt.setRandomPolyfill = function(getRandomValues) {
         _getRandomValues = getRandomValues;
