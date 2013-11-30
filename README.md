@@ -203,7 +203,7 @@ Command line
 ------------
 `Usage: bcrypt <input> [salt]`
 
-If the input got spaces inside, simply surround it with quotes.
+If the input has spaces inside, simply surround it with quotes.
 
 Downloads
 ---------
