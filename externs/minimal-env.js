@@ -84,10 +84,3 @@ var define = function(name, constructor) {};
  * @type {boolean}
  */
 define.amd;
-
-/**
- * @param {function()} cb
- * @param {...[*]} varargs
- * @returns {*}
- */
-var setImmediate = function(cb, varargs) {};
