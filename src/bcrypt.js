@@ -438,7 +438,11 @@
      */
     function _nextTick(callback) {
         if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
-            process.nextTick(callback);
+            if (typeof setImmediate === 'function') {
+                setImmediate(callback);
+            } else {
+                process.nextTick(callback);
+            }
         } else {
             setTimeout(callback, 0);
         }
