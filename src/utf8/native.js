@@ -1,3 +1,5 @@
+// #include "utf8/codepoint.js"
+
 /**
  * Encodes a unicode code point to bytes.
  * @param {number} codePoint Code point to encode

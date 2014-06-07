@@ -60,20 +60,12 @@
         49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
     
     /**
-     * Length-delimited base64 encoder and decoder.
-     * @type {Object.<string,function(string, number)>}
-     * @private
-     */
-    var base64 = {};
-    
-    /**
      * Encodes a byte array to base64 with up to len bytes of input.
      * @param {Array.<number>} b Byte array
      * @param {number} len Maximum input length
      * @returns {string}
-     * @private
      */
-    base64.encode = function(b, len) {
+    function base64_encode(b, len) {
         var off = 0;
         var rs = [];
         var c1;
@@ -103,16 +95,15 @@
             rs.push(BASE64_CODE[c2 & 0x3f]);
         }
         return rs.join('');
-    };
+    }
     
     /**
      * Decodes a base64 encoded string to up to len bytes of output.
      * @param {string} s String to decode
      * @param {number} len Maximum output length
      * @returns {Array.<number>}
-     * @private
      */
-    base64.decode = function(s, len) {
+    function base64_decode(s, len) {
         var off = 0;
         var slen = s.length;
         var olen = 0;
@@ -156,7 +147,8 @@
             res.push(rs[off].charCodeAt(0));
         }
         return res;
-    };    
+    }
+        
     // ref: http://mths.be/fromcodepoint v0.1.0 by @mathias
     /* if (!String.fromCodePoint) {
         (function () {
@@ -843,7 +835,7 @@
 
         var passwordb = _stringToBytes(s);
         var saltb = [];
-        saltb = base64.decode(real_salt, BCRYPT_SALT_LEN);
+        saltb = base64_decode(real_salt, BCRYPT_SALT_LEN);
 
         /**
          * Finishs hashing.
@@ -859,8 +851,8 @@
             if (rounds < 10) res.push("0");
             res.push(rounds.toString());
             res.push("$");
-            res.push(base64.encode(saltb, saltb.length));
-            res.push(base64.encode(bytes, C_ORIG.length * 4 - 1));
+            res.push(base64_encode(saltb, saltb.length));
+            res.push(base64_encode(bytes, C_ORIG.length * 4 - 1));
             return res.join('');
         }
 
@@ -925,7 +917,7 @@
         salt.push(rounds.toString());
         salt.push('$');
         try {
-            salt.push(base64.encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
+            salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
             return salt.join('');
         } catch(err) {
             throw(err);

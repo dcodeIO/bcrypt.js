@@ -33,9 +33,7 @@
  */
 (function(global) {
 
-    // #include "base64.js"
-    
-    // #include "utf8/codepoint.js"
+    // #include "base64/native.js"
     
     // #include "utf8/native.js"
     
@@ -590,7 +588,7 @@
 
         var passwordb = _stringToBytes(s);
         var saltb = [];
-        saltb = base64.decode(real_salt, BCRYPT_SALT_LEN);
+        saltb = base64_decode(real_salt, BCRYPT_SALT_LEN);
 
         /**
          * Finishs hashing.
@@ -606,8 +604,8 @@
             if (rounds < 10) res.push("0");
             res.push(rounds.toString());
             res.push("$");
-            res.push(base64.encode(saltb, saltb.length));
-            res.push(base64.encode(bytes, C_ORIG.length * 4 - 1));
+            res.push(base64_encode(saltb, saltb.length));
+            res.push(base64_encode(bytes, C_ORIG.length * 4 - 1));
             return res.join('');
         }
 
@@ -672,7 +670,7 @@
         salt.push(rounds.toString());
         salt.push('$');
         try {
-            salt.push(base64.encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
+            salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
             return salt.join('');
         } catch(err) {
             throw(err);

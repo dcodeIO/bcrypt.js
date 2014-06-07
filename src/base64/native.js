@@ -1,10 +1,3 @@
-// #ifdef UNDEFINED
-//
-// TODO (dcode): Now that it's optimized, find out if we really need this. The only advantage over using Buffer to do
-// this actually is decoding to a fixed output length, which is much faster than calling Buffer.toString for each
-// character separately.
-//
-// #endif
 /**
  * @type {Array.<string>}
  * @const
@@ -32,20 +25,12 @@ var BASE64_INDEX = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
 
 /**
- * Length-delimited base64 encoder and decoder.
- * @type {Object.<string,function(string, number)>}
- * @private
- */
-var base64 = {};
-
-/**
  * Encodes a byte array to base64 with up to len bytes of input.
  * @param {Array.<number>} b Byte array
  * @param {number} len Maximum input length
  * @returns {string}
- * @private
  */
-base64.encode = function(b, len) {
+function base64_encode(b, len) {
     var off = 0;
     var rs = [];
     var c1;
@@ -75,16 +60,15 @@ base64.encode = function(b, len) {
         rs.push(BASE64_CODE[c2 & 0x3f]);
     }
     return rs.join('');
-};
+}
 
 /**
  * Decodes a base64 encoded string to up to len bytes of output.
  * @param {string} s String to decode
  * @param {number} len Maximum output length
  * @returns {Array.<number>}
- * @private
  */
-base64.decode = function(s, len) {
+function base64_decode(s, len) {
     var off = 0;
     var slen = s.length;
     var olen = 0;
@@ -128,4 +112,4 @@ base64.decode = function(s, len) {
         res.push(rs[off].charCodeAt(0));
     }
     return res;
-};
+}
