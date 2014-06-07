@@ -35,6 +35,10 @@
 
     // #include "base64.js"
     
+    // #include "utf8/codepoint.js"
+    
+    // #include "utf8/native.js"
+    
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -534,18 +538,17 @@
         }
     }
 
-    function _stringToBytes ( str ) {
-        var ch, st, re = [];
-        for (var i = 0; i < str.length; i++ ) {
-            ch = str.charCodeAt(i);
-            st = [];
-            do {
-                st.push( ch & 0xFF );
-                ch = ch >> 8;
-            } while (ch);
-            re = re.concat( st.reverse() );
+    function _stringToBytes(str) {
+        var cp, out = [];
+        for (var i=0; i<str.length; i++) {
+            cp = str.charCodeAt(i);
+            if (cp >= 0xD800 && cp <= 0xDFFF) {
+                cp = str.codePointAt(i);
+                if (cp > 0xFFFF) i++;
+            }
+            utf8_encode_char(cp, out);
         }
-        return re;
+        return out;
     }
 
     /**

@@ -84,3 +84,15 @@ var define = function(name, constructor) {};
  * @type {boolean}
  */
 define.amd;
+
+/**
+ * @param {...*} var_args
+ * @returns {string}
+ */
+String.fromCodePoint = function(var_args) {};
+
+/**
+ * @param {number} offset
+ * @returns {number}
+ */
+String.prototype.codePointAt = function(offset) {};
