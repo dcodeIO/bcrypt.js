@@ -207,6 +207,7 @@ If the input has spaces inside, simply surround it with quotes.
 
 Downloads
 ---------
+* [Distributions](https://github.com/dcodeIO/bcrypt.js/tree/master/dist)
 * [ZIP-Archive](https://github.com/dcodeIO/bcrypt.js/archive/master.zip)
 * [Tarball](https://github.com/dcodeIO/bcrypt.js/tarball/master)
 

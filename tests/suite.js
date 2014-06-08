@@ -1,5 +1,7 @@
 var path = require("path"),
-    bcrypt = require(path.join(__dirname, '..', 'bcrypt.js'));
+    fs = require("fs"),
+    binding = require("bcrypt"),
+    bcrypt = require(path.join(__dirname, '..', 'index.js'));
     
 module.exports = {
     
@@ -81,6 +83,15 @@ module.exports = {
     "getRounds": function(test) {
         var hash1 = bcrypt.hashSync("hello", bcrypt.genSaltSync());
         test.equal(bcrypt.getRounds(hash1), 10);
+        test.done();
+    },
+    
+    "compat": function(test) {
+        var pass = fs.readFileSync(path.join(__dirname, "quickbrown.txt"))+"",
+            salt = bcrypt.genSaltSync(),
+            hash1 = binding.hashSync(pass, salt),
+            hash2 = bcrypt.hashSync(pass, salt);
+        test.equal(hash1, hash2);
         test.done();
     }
 };

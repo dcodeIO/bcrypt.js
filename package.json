@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies. 100% typed code. Fully compatible to 'bcrypt'.",
-    "version": "1.0.0-pre",
+    "version": "1.0.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "contributors": [
         "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",
@@ -26,18 +26,19 @@
         "crypt",
         "crypto"
     ],
-    "main": "./bcrypt.min.js",
+    "main": "index.js",
     "dependencies": {},
     "devDependencies": {
         "testjs": "latest",
         "preprocessor": "latest",
-        "closurecompiler": "latest"
+        "closurecompiler": "latest",
+        "bcrypt": "latest"
     },
     "license": "Apache-2.0",
     "scripts": {
         "test": "node node_modules/testjs/bin/testjs",
-        "build": "preprocess ./src/bcrypt.js ./src > ./bcrypt.js",
-        "compile": "ccjs bcrypt.js --warning_level=VERBOSE --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js > bcrypt.min.js",
+        "build": "preprocess ./src/bcrypt.js ./src > ./dist/bcrypt.js",
+        "compile": "ccjs dist/bcrypt.js --warning_level=VERBOSE --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js > dist/bcrypt.min.js",
         "make": "npm run-script build && npm run-script compile && npm test"
     }
 }

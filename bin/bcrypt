@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var path = require("path"),
-    bcrypt = require(path.join(__dirname, '..', 'bcrypt.js')),
+    bcrypt = require(path.join(__dirname, '..', 'index.js')),
     pkg = require(path.join(__dirname, '..', 'package.json'));
 
 if (process.argv.length < 3) {
