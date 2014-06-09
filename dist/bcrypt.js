@@ -989,7 +989,7 @@
      */
     bcrypt.hashSync = function(s, salt) {
         if (!salt) salt = GENSALT_DEFAULT_LOG2_ROUNDS;
-        if (typeof salt == 'number') {
+        if (typeof salt === 'number') {
             salt = bcrypt.genSaltSync(salt);
         }
         return _hash(s, salt);
@@ -1003,10 +1003,10 @@
      * @expose
      */
     bcrypt.hash = function(s, salt, callback) {
-        if (typeof callback != 'function') {
+        if (typeof callback !== 'function') {
             throw(new Error("Illegal 'callback': "+callback));
         }
-        if (typeof salt == 'number') {
+        if (typeof salt === 'number') {
             bcrypt.genSalt(salt, function(err, salt) {
                 _hash(s, salt, callback);
             });
@@ -1024,12 +1024,10 @@
      * @expose
      */
     bcrypt.compareSync = function(s, hash) {
-        if(typeof s != "string" ||  typeof hash != "string") {
+        if(typeof s !== "string" ||  typeof hash !== "string") {
             throw(new Error("Illegal argument types: "+(typeof s)+', '+(typeof hash)));
         }
-        if(hash.length != 60) {
-            throw(new Error("Illegal hash length: "+hash.length+" != 60"));
-        }
+        if (hash.length !== 60) return false;
         var comp = bcrypt.hashSync(s, hash.substr(0, hash.length-31));
         var same = comp.length == hash.length;
         var max_length = (comp.length < hash.length) ? comp.length : hash.length;
@@ -1053,7 +1051,7 @@
      * @expose
      */
     bcrypt.compare = function(s, hash, callback) {
-        if (typeof callback != 'function') {
+        if (typeof callback !== 'function') {
             throw(new Error("Illegal 'callback': "+callback));
         }
         bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
@@ -1069,7 +1067,7 @@
      * @expose
      */
     bcrypt.getRounds = function(hash) {
-        if(typeof hash != "string") {
+        if(typeof hash !== "string") {
             throw(new Error("Illegal type of 'hash': "+(typeof hash)));
         }
         return parseInt(hash.split("$")[2], 10);
@@ -1083,19 +1081,19 @@
      * @expose
      */
     bcrypt.getSalt = function(hash) {
-        if (typeof hash != 'string') {
+        if (typeof hash !== 'string') {
             throw(new Error("Illegal type of 'hash': "+(typeof hash)));
         }
-        if(hash.length != 60) {
+        if (hash.length !== 60) {
             throw(new Error("Illegal hash length: "+hash.length+" != 60"));
         }
         return hash.substring(0, 29);
     };
 
     // Enable module loading if available
-    if (typeof module != 'undefined' && module["exports"]) { // CommonJS
+    if (typeof module !== 'undefined' && module["exports"]) { // CommonJS
         module["exports"] = bcrypt;
-    } else if (typeof define != 'undefined' && define["amd"]) { // AMD
+    } else if (typeof define !== 'undefined' && define["amd"]) { // AMD
         define("bcrypt", function() { return bcrypt; });
     } else { // Shim
         if (!global["dcodeIO"]) {
