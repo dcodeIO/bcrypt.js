@@ -13,6 +13,15 @@ Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=mast
 * Small footprint
 * Closure Compiler [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
 
+Security considerations
+-----------------------
+Besides incorporating a salt to protect against rainbow table attacks, bcrypt is an adaptive function: over time, the
+iteration count can be increased to make it slower, so it remains resistant to brute-force search attacks even with
+increasing computation power. ([see](http://en.wikipedia.org/wiki/Bcrypt))
+
+While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower, effectively
+reducing the number of iterations that can be processed in an equal time span.
+
 Usage
 -----
 
