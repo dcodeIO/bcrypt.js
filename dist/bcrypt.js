@@ -702,21 +702,30 @@
      * @param {Array.<number>} b Bytes to crypt
      * @param {Array.<number>} salt Salt bytes to use
      * @param {number} rounds Number of rounds
-     * @param {function(Error, Array.<number>)=} callback Callback receiving the error, if any, and the resulting bytes. If
+     * @param {function(Error, Array.<number>=)=} callback Callback receiving the error, if any, and the resulting bytes. If
      *  omitted, the operation will be performed synchronously.
-     * @returns {Array.<number>} Resulting bytes or if callback has been omitted, otherwise null
+     * @returns {!Array.<number>|undefined} Resulting bytes if callback has been omitted, otherwise `undefined`
      * @private
      */
     function _crypt(b, salt, rounds, callback) {
-        var cdata = C_ORIG.slice();
-        var clen = cdata.length;
+        var cdata = C_ORIG.slice(),
+            clen = cdata.length,
+            err;
 
         // Validate
         if (rounds < 4 || rounds > 31) {
-            throw(new Error("Illegal number of rounds: "+rounds));
+            err = new Error("Illegal number of rounds: "+rounds);
+            if (callback) {
+                _nextTick(callback.bind(this, err));
+                return;
+            } else throw err;
         }
         if (salt.length != BCRYPT_SALT_LEN) {
-            throw(new Error("Illegal salt length: "+salt.length+" != "+BCRYPT_SALT_LEN));
+            err = new Error("Illegal salt length: "+salt.length+" != "+BCRYPT_SALT_LEN);
+            if (callback) {
+                _nextTick(callback.bind(this, err));
+                return;
+            } else throw err;
         }
         rounds = 1 << rounds;
         var P = P_ORIG.slice();
@@ -728,7 +737,7 @@
 
         /**
          * Calcualtes the next round.
-         * @returns {Array.<number>} Resulting array if callback has been omitted, otherwise null
+         * @returns {Array.<number>|undefined} Resulting array if callback has been omitted, otherwise `undefined`
          * @private
          */
         function next() {
@@ -757,7 +766,7 @@
                 }
                 if (callback) {
                     callback(null, ret);
-                    return null;
+                    return;
                 } else {
                     return ret;
                 }
@@ -765,19 +774,18 @@
             if (callback) {
                 _nextTick(next);
             }
-            return null;
         }
 
         // Async
         if (typeof callback !== 'undefined') {
             next();
-            return null;
+
          // Sync
         } else {
             var res;
             while (true) {
-                if ((res = next()) !== null) {
-                    return res;
+                if ((res = next()) !== undefined) {
+                    return res || [];
                 }
             }
         }
@@ -800,32 +808,54 @@
      * Internally hashes a string.
      * @param {string} s String to hash
      * @param {?string} salt Salt to use, actually never null
-     * @param {function(Error, ?string)=} callback Callback receiving the error, if any, and the resulting hash. If omitted,
+     * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash. If omitted,
      *  hashing is perormed synchronously.
-     * @returns {?string} Resulting hash if callback has been omitted, else null
+     * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
      * @private
      */
     function _hash(s, salt, callback) {
-
+        var err;
+        if (typeof s !== 'string' || typeof salt !== 'string') {
+            err = new Error("Invalid string / salt: Not a string");
+            if (callback) {
+                _nextTick(callback.bind(this, err));
+                return;
+            }
+            else throw err;
+        }
+        
         // Validate the salt
         var minor, offset;
-        if (salt.charAt(0) != '$' || salt.charAt(1) != '2') {
-            throw(new Error("Invalid salt version: "+salt.substring(0,2)));
+        if (salt.charAt(0) !== '$' || salt.charAt(1) !== '2') {
+            err = new Error("Invalid salt version: "+salt.substring(0,2));
+            if (callback) {
+                _nextTick(callback.bind(this, err));
+                return;
+            }
+            else throw err;
         }
-        if (salt.charAt(2) == '$') {
+        if (salt.charAt(2) === '$') {
             minor = String.fromCharCode(0);
             offset = 3;
         } else {
             minor = salt.charAt(2);
             if (minor != 'a' || salt.charAt(3) != '$') {
-                throw(new Error("Invalid salt revision: "+salt.substring(2,4)));
+                err = new Error("Invalid salt revision: "+salt.substring(2,4));
+                if (callback) {
+                    _nextTick(callback.bind(this, err));
+                    return;
+                } else throw err;
             }
             offset = 4;
         }
 
         // Extract number of rounds
         if (salt.charAt(offset + 2) > '$') {
-            throw(new Error("Missing salt rounds"));
+            err = new Error("Missing salt rounds");
+            if (callback) {
+                _nextTick(callback.bind(this, err));
+                return;
+            } else throw err;
         }
         var r1 = parseInt(salt.substring(offset, offset + 1), 10) * 10;
         var r2 = parseInt(salt.substring(offset + 1, offset + 2), 10);
@@ -838,7 +868,7 @@
         saltb = base64_decode(real_salt, BCRYPT_SALT_LEN);
 
         /**
-         * Finishs hashing.
+         * Finishes hashing.
          * @param {Array.<number>} bytes Byte array
          * @returns {string}
          * @private
@@ -860,7 +890,7 @@
         if (typeof callback == 'undefined') {
             return finish(_crypt(passwordb, saltb, rounds));
 
-            // Async
+        // Async
         } else {
             _crypt(passwordb, saltb, rounds, function(err, bytes) {
                 if (err) {
@@ -869,7 +899,6 @@
                     callback(null, finish(bytes));
                 }
             });
-            return null;
         }
     }
 
@@ -893,7 +922,7 @@
             } else if (typeof _getRandomValues === 'function') {
                 _getRandomValues(array);
             } else {
-                throw(new Error("Failed to generate random values: Web Crypto API not available / no polyfill set"));
+                throw(new Error("Failed to generate random values: Web Crypto API not available / polyfill not set through bcrypt.setRandomPolyfill"));
             }
             return Array.prototype.slice.call(array);
         }
@@ -907,13 +936,13 @@
      * @private
      */
     function _gensalt(rounds) {
-        rounds = rounds || 10;
+        rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
         if (rounds < 4 || rounds > 31) {
             throw(new Error("Illegal number of rounds: "+rounds));
         }
         var salt = [];
         salt.push("$2a$");
-        if (rounds < GENSALT_DEFAULT_LOG2_ROUNDS) salt.push("0");
+        if (rounds < 10) salt.push("0");
         salt.push(rounds.toString());
         salt.push('$');
         try {
@@ -944,38 +973,41 @@
      * @expose
      */
     bcrypt.genSaltSync = function(rounds, seed_length) {
-        if (!rounds) rounds = 10;
+        if (typeof rounds === 'undefined')
+            rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
+        else if (typeof rounds !== 'number')
+            throw(new Error("Illegal argument types: "+(typeof rounds)+", "+(typeof seed_length)));
         return _gensalt(rounds);
     };
 
     /**
      * Asynchronously generates a salt.
-     * @param {(number|function(Error, ?string))=} rounds Number of rounds to use, defaults to 10 if omitted
-     * @param {(number|function(Error, ?string))=} seed_length Not supported.
+     * @param {(number|function(Error, string=))=} rounds Number of rounds to use, defaults to 10 if omitted
+     * @param {(number|function(Error, string=))=} seed_length Not supported.
      * @param {function(Error, ?string)=} callback Callback receiving the error, if any, and the resulting salt
      * @expose
      */
     bcrypt.genSalt = function(rounds, seed_length, callback) {
-        if (typeof seed_length == 'function') {
+        if (typeof seed_length === 'function') {
             callback = seed_length;
-            seed_length = -1; // Not supported.
+            seed_length = undefined; // Not supported.
         }
         var rnd; // Hello closure
-        if (typeof rounds == 'function') {
+        if (typeof rounds === 'function') {
             callback = rounds;
             rnd = GENSALT_DEFAULT_LOG2_ROUNDS;
-        } else {
-            rnd = parseInt(rounds, 10);
         }
-        if (typeof callback != 'function') {
-            throw(new Error("Illegal or missing 'callback': "+callback));
+        if (typeof callback !== 'function')
+            throw(new Error("Illegal callback: "+callback));
+        if (typeof rounds !== 'number') {
+            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof rounds))));
+            return;
         }
         _nextTick(function() { // Pretty thin, but salting is fast enough
             try {
-                var res = bcrypt.genSaltSync(rnd);
-                callback(null, res);
+                callback(null, bcrypt.genSaltSync(rnd));
             } catch(err) {
-                callback(err, null);
+                callback(err);
             }
         });
     };
@@ -984,14 +1016,16 @@
      * Synchronously generates a hash for the given string.
      * @param {string} s String to hash
      * @param {(number|string)=} salt Salt length to generate or salt to use, default to 10
-     * @returns {?string} Resulting hash, actually never null
+     * @returns {string} Resulting hash
      * @expose
      */
     bcrypt.hashSync = function(s, salt) {
-        if (!salt) salt = GENSALT_DEFAULT_LOG2_ROUNDS;
-        if (typeof salt === 'number') {
+        if (typeof salt === 'undefined')
+            salt = GENSALT_DEFAULT_LOG2_ROUNDS;
+        if (typeof salt === 'number')
             salt = bcrypt.genSaltSync(salt);
-        }
+        if (typeof s !== 'string' || typeof salt !== 'string')
+            throw new Error("Illegal argument types: "+(typeof s)+', '+(typeof salt));
         return _hash(s, salt);
     };
 
@@ -999,19 +1033,20 @@
      * Asynchronously generates a hash for the given string.
      * @param {string} s String to hash
      * @param {number|string} salt Salt length to generate or salt to use
-     * @param {function(Error, ?string)} callback Callback receiving the error, if any, and the resulting hash
+     * @param {function(Error, string=)} callback Callback receiving the error, if any, and the resulting hash
      * @expose
      */
     bcrypt.hash = function(s, salt, callback) {
-        if (typeof callback !== 'function') {
-            throw(new Error("Illegal 'callback': "+callback));
-        }
-        if (typeof salt === 'number') {
+        if (typeof callback !== 'function')
+            throw(new Error("Illegal callback: "+callback));
+        if (typeof s === 'string' && typeof salt === 'number') {
             bcrypt.genSalt(salt, function(err, salt) {
                 _hash(s, salt, callback);
             });
-        } else {
+        } else if (typeof s === 'string' && typeof salt === 'string') {
             _hash(s, salt, callback);
+        } else {
+            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof s)+', '+(typeof salt))));
         }
     };
 
@@ -1024,12 +1059,11 @@
      * @expose
      */
     bcrypt.compareSync = function(s, hash) {
-        if(typeof s !== "string" ||  typeof hash !== "string") {
+        if (typeof s !== "string" || typeof hash !== "string")
             throw(new Error("Illegal argument types: "+(typeof s)+', '+(typeof hash)));
-        }
         if (hash.length !== 60) return false;
         var comp = bcrypt.hashSync(s, hash.substr(0, hash.length-31));
-        var same = comp.length == hash.length;
+        var same = comp.length === hash.length;
         var max_length = (comp.length < hash.length) ? comp.length : hash.length;
 
         // to prevent timing attacks, should check entire string
@@ -1051,8 +1085,11 @@
      * @expose
      */
     bcrypt.compare = function(s, hash, callback) {
-        if (typeof callback !== 'function') {
-            throw(new Error("Illegal 'callback': "+callback));
+        if (typeof callback !== 'function')
+            throw(new Error("Illegal callback: "+callback));
+        if (typeof s !== "string" || typeof hash !== "string") {
+            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof s)+', '+(typeof hash))));
+            return;
         }
         bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
             callback(err, hash === comp);
@@ -1067,26 +1104,23 @@
      * @expose
      */
     bcrypt.getRounds = function(hash) {
-        if(typeof hash !== "string") {
-            throw(new Error("Illegal type of 'hash': "+(typeof hash)));
-        }
+        if (typeof hash !== "string")
+            throw(new Error("Illegal argument types: "+(typeof hash)));
         return parseInt(hash.split("$")[2], 10);
     };
 
     /**
-     * Gets the salt portion from a hash.
+     * Gets the salt portion from a hash. Does not validate the hash.
      * @param {string} hash Hash to extract the salt from
-     * @returns {string} Extracted salt part portion
+     * @returns {string} Extracted salt part
      * @throws {Error} If `hash` is not a string or otherwise invalid
      * @expose
      */
     bcrypt.getSalt = function(hash) {
-        if (typeof hash !== 'string') {
-            throw(new Error("Illegal type of 'hash': "+(typeof hash)));
-        }
-        if (hash.length !== 60) {
+        if (typeof hash !== 'string')
+            throw(new Error("Illegal argument types: "+(typeof hash)));
+        if (hash.length !== 60)
             throw(new Error("Illegal hash length: "+hash.length+" != 60"));
-        }
         return hash.substring(0, 29);
     };
 

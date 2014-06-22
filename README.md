@@ -1,8 +1,7 @@
 ![bcrypt.js - bcrypt in plain JavaScript](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
 ===========
-Optimized bcrypt in plain JavaScript with zero dependencies. Compiled through Closure Compiler using advanced
-optimizations, 100% typed code. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt) binding and also
-working in the browser.
+Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt)
+binding and also working in the browser.
 
 Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=master)
 --------
@@ -11,7 +10,7 @@ Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=mast
 * RequireJS/AMD compatible
 * Zero production dependencies
 * Small footprint
-* Closure Compiler [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
+* Compiled with Closure Compiler using advanced optimizations, [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
 
 Security considerations
 -----------------------
