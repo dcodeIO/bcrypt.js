@@ -32,6 +32,7 @@
  * see: https://github.com/dcodeIO/bcrypt.js for details
  */
 (function(global) {
+    "use strict";
 
     /**
      * @type {Array.<string>}
@@ -839,7 +840,7 @@
             offset = 3;
         } else {
             minor = salt.charAt(2);
-            if (minor != 'a' || salt.charAt(3) != '$') {
+            if ((minor !== 'a' && minor !== 'y') || salt.charAt(3) !== '$') {
                 err = new Error("Invalid salt revision: "+salt.substring(2,4));
                 if (callback) {
                     _nextTick(callback.bind(this, err));
@@ -861,7 +862,7 @@
         var r2 = parseInt(salt.substring(offset + 1, offset + 2), 10);
         var rounds = r1 + r2;
         var real_salt = salt.substring(offset + 3, offset + 25);
-        s += minor >= 'a' ? "\000" : "";
+        s += minor >= 'a' ? "\x00" : "";
 
         var passwordb = _stringToBytes(s);
         var saltb = [];
