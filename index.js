@@ -26,6 +26,6 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 var path = require("path"),
-    bcrypt = require(path.join(__dirname, "dist", "bcrypt.js"));
+    bcrypt = require("./dist/bcrypt.js");
 
 module.exports = bcrypt;
