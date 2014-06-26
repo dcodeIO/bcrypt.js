@@ -39,8 +39,11 @@ module.exports = {
     },
     
     "compareSync": function(test) {
-        var hash1 = bcrypt.hashSync("hello", bcrypt.genSaltSync());
-        var hash2 = bcrypt.hashSync("world", bcrypt.genSaltSync());
+        var salt1 = bcrypt.genSaltSync(),
+            hash1 = bcrypt.hashSync("hello", salt1); // $2a$
+        var salt2 = bcrypt.genSaltSync();
+        salt2 = salt2.substring(0,2)+'y'+salt2.substring(3); // $2y$
+        var hash2 = bcrypt.hashSync("world", salt2);
         test.ok(bcrypt.compareSync("hello", hash1));
         test.notOk(bcrypt.compareSync("hello", hash2));
         test.ok(bcrypt.compareSync("world", hash2));
