@@ -149,7 +149,7 @@
         }
         return res;
     }
-        
+    
     // ref: http://mths.be/fromcodepoint v0.1.0 by @mathias
     /* if (!String.fromCodePoint) {
         (function () {
@@ -284,7 +284,7 @@
         } else
             throw RangeError("Illegal code point: "+codePoint);
     }
-        
+    
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -824,7 +824,7 @@
             }
             else throw err;
         }
-        
+
         // Validate the salt
         var minor, offset;
         if (salt.charAt(0) !== '$' || salt.charAt(1) !== '2') {
@@ -914,7 +914,7 @@
         if (typeof module !== 'undefined' && module.exports) {
             var crypto = require("crypto");
             return crypto.randomBytes(len);
-            
+
         // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
         } else {
             var array = new Uint32Array(len);
@@ -953,10 +953,10 @@
             throw(err);
         }
     }
-    
+
     // crypto.getRandomValues polyfill to use
     var _getRandomValues = null;
-    
+
     /**
      * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
      * @param {function(Uint32Array)} getRandomValues The actual implementation
@@ -993,10 +993,9 @@
             callback = seed_length;
             seed_length = undefined; // Not supported.
         }
-        var rnd; // Hello closure
         if (typeof rounds === 'function') {
             callback = rounds;
-            rnd = GENSALT_DEFAULT_LOG2_ROUNDS;
+            rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
         }
         if (typeof callback !== 'function')
             throw(new Error("Illegal callback: "+callback));
@@ -1006,7 +1005,7 @@
         }
         _nextTick(function() { // Pretty thin, but salting is fast enough
             try {
-                callback(null, bcrypt.genSaltSync(rnd));
+                callback(null, bcrypt.genSaltSync(rounds));
             } catch(err) {
                 callback(err);
             }
@@ -1136,6 +1135,6 @@
         }
         global["dcodeIO"]["bcrypt"] = bcrypt;
     }
-    
+
 })(this);
 
