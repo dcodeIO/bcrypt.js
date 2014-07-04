@@ -993,10 +993,9 @@
             callback = seed_length;
             seed_length = undefined; // Not supported.
         }
-        var rnd; // Hello closure
         if (typeof rounds === 'function') {
             callback = rounds;
-            rnd = GENSALT_DEFAULT_LOG2_ROUNDS;
+            rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
         }
         if (typeof callback !== 'function')
             throw(new Error("Illegal callback: "+callback));
@@ -1006,7 +1005,7 @@
         }
         _nextTick(function() { // Pretty thin, but salting is fast enough
             try {
-                callback(null, bcrypt.genSaltSync(rnd));
+                callback(null, bcrypt.genSaltSync(rounds));
             } catch(err) {
                 callback(err);
             }
