@@ -156,7 +156,7 @@ Synchronously generates a hash for the given string.
 |   |||
 | **returns** | ?string | Resulting hash, actually never null
 
-### bcrypt.hash(s, salt, callback)
+### bcrypt.hash(s, salt, callback, progressCallback=)
 Asynchronously generates a hash for the given string.
 
 | Name | Type | Description |
@@ -164,6 +164,7 @@ Asynchronously generates a hash for the given string.
 | s | string | String to hash |
 | salt | number &#166; string | Salt length to generate or salt to use |
 | callback | function(Error, ?string) | Callback receiving the error, if any, and the resulting hash |
+| progressCallback | function(number) | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
 
 ### bcrypt.compareSync(s, hash)
 Synchronously tests a string against a hash.
@@ -176,7 +177,7 @@ Synchronously tests a string against a hash.
 | **returns** | boolean | true if matching, otherwise false
 | **throws** | Error | If an argument is illegal
 
-### bcrypt.compare(s, hash, callback)
+### bcrypt.compare(s, hash, callback, progressCallback=)
 Asynchronously compares the given data against the given hash.
 
 | Name | Type | Description |
@@ -184,6 +185,7 @@ Asynchronously compares the given data against the given hash.
 | s | string | Data to compare |
 | hash | string | Data to be compared to |
 | callback | function(Error, boolean) | Callback receiving the error, if any, otherwise the result |
+| progressCallback | function(number) | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
 |   |||
 | **throws** | Error | If the callback argument is invalid
 

@@ -812,7 +812,7 @@
         // Validate the salt
         var minor, offset;
         if (salt.charAt(0) !== '$' || salt.charAt(1) !== '2') {
-            err = new Error("Invalid salt version: "+salt.substring(0,2));
+            err = Error("Invalid salt version: "+salt.substring(0,2));
             if (callback) {
                 _nextTick(callback.bind(this, err));
                 return;
@@ -1014,7 +1014,8 @@
      * @param {string} s String to hash
      * @param {number|string} salt Salt length to generate or salt to use
      * @param {function(Error, string=)} callback Callback receiving the error, if any, and the resulting hash
-     * @param {function(number)=} progressCallback Callback called with the current progress
+     * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
+     *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
      * @expose
      */
     bcrypt.hash = function(s, salt, callback, progressCallback) {
@@ -1059,15 +1060,16 @@
      * @param {string} s Data to compare
      * @param {string} hash Data to be compared to
      * @param {function(Error, boolean)} callback Callback receiving the error, if any, otherwise the result
-     * @param {function(number)=} progressCallback Callback called with the current progress
+     * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
+     *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
      * @throws {Error} If the callback argument is invalid
      * @expose
      */
     bcrypt.compare = function(s, hash, callback, progressCallback) {
         if (typeof callback !== 'function')
-            throw(new Error("Illegal callback: "+callback));
+            throw Error("Illegal callback: "+callback);
         if (typeof s !== "string" || typeof hash !== "string") {
-            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof s)+', '+(typeof hash))));
+            _nextTick(callback.bind(this, Error("Illegal argument types: "+(typeof s)+', '+(typeof hash))));
             return;
         }
         bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
