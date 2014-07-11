@@ -99,5 +99,22 @@ module.exports = {
             hash2 = bcrypt.hashSync(pass, salt);
         test.equal(hash1, hash2);
         test.done();
+    },
+    
+    "progress": function(test) {
+        bcrypt.genSalt(12, function(err, salt) {
+            test.ok(!err);
+            var progress = [];
+            bcrypt.hash("hello world", salt, function(err, hash) {
+                test.ok(!err);
+                test.ok(typeof hash === 'string');
+                test.ok(progress.length >= 2);
+                test.strictEqual(progress[0], 0);
+                test.strictEqual(progress[progress.length-1], 1);
+                test.done();
+            }, function(n) {
+                progress.push(n);
+            });
+        });
     }
 };

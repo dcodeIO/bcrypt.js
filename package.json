@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to 'bcrypt'.",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "contributors": [
         "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",

@@ -563,26 +563,24 @@
      * @private
      */
     function _encipher(lr, off, P, S) { // This is our bottleneck: 1714/1905 ticks / 90% - see profile.txt
-        var n;
-        var l = lr[off];
-        var r = lr[off + 1];
+        var n,
+            l = lr[off],
+            r = lr[off + 1];
 
         l ^= P[0];
-        for (var i=0; i<=BLOWFISH_NUM_ROUNDS-2;) {
+        for (var i=0; i<=BLOWFISH_NUM_ROUNDS-2;)
             // Feistel substitution on left word
-            n  = S[(l >> 24) & 0xff];
-            n += S[0x100 | ((l >> 16) & 0xff)];
-            n ^= S[0x200 | ((l >> 8) & 0xff)];
-            n += S[0x300 | (l & 0xff)];
-            r ^= n ^ P[++i];
-
+            n  = S[(l >> 24) & 0xff],
+            n += S[0x100 | ((l >> 16) & 0xff)],
+            n ^= S[0x200 | ((l >> 8) & 0xff)],
+            n += S[0x300 | (l & 0xff)],
+            r ^= n ^ P[++i],
             // Feistel substitution on right word
-            n  = S[(r >> 24) & 0xff];
-            n += S[0x100 | ((r >> 16) & 0xff)];
-            n ^= S[0x200 | ((r >> 8) & 0xff)];
-            n += S[0x300 | (r & 0xff)];
+            n  = S[(r >> 24) & 0xff],
+            n += S[0x100 | ((r >> 16) & 0xff)],
+            n ^= S[0x200 | ((r >> 8) & 0xff)],
+            n += S[0x300 | (r & 0xff)],
             l ^= n ^ P[++i];
-        }
         lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
         return lr;
@@ -595,9 +593,8 @@
      * @private
      */
     function _streamtoword(data, offp) {
-        var i;
         var word = 0;
-        for (i = 0; i < 4; i++) {
+        for (var i = 0; i < 4; i++) {
             word = (word << 8) | (data[offp] & 0xff);
             offp = (offp + 1) % data.length;
         }
@@ -611,26 +608,23 @@
      * @private
      */
     function _key(key, P, S) {
-        var offset = 0;
-        var lr = new Array(0x00000000, 0x00000000);
-        var plen = P.length;
-        var slen = S.length;
-        for (var i = 0; i < plen; i++) {
-            var sw = _streamtoword(key, offset);
-            offset = sw.offp;
+        var offset = 0,
+            lr = [0, 0],
+            plen = P.length,
+            slen = S.length,
+            sw;
+        for (var i = 0; i < plen; i++)
+            sw = _streamtoword(key, offset),
+            offset = sw.offp,
             P[i] = P[i] ^ sw.key;
-        }
-        for (i = 0; i < plen; i += 2) {
-            lr = _encipher(lr, 0, P, S);
-            P[i] = lr[0];
+        for (i = 0; i < plen; i += 2)
+            lr = _encipher(lr, 0, P, S),
+            P[i] = lr[0],
             P[i + 1] = lr[1];
-        }
-
-        for (i = 0; i < slen; i += 2) {
-            lr = _encipher(lr, 0, P, S);
-            S[i] = lr[0];
+        for (i = 0; i < slen; i += 2)
+            lr = _encipher(lr, 0, P, S),
+            S[i] = lr[0],
             S[i + 1] = lr[1];
-        }
     }
 
     /**
@@ -642,43 +636,36 @@
      * @private
      */
     function _ekskey(data, key, P, S) {
-        var offp = 0;
-        var lr = new Array(0x00000000, 0x00000000);
-        var plen = P.length;
-        var slen = S.length;
-        var sw;
-        for (var i = 0; i < plen; i++) {
-            sw = _streamtoword(key, offp);
-            offp = sw.offp;
+        var offp = 0,
+            lr = [0, 0],
+            plen = P.length,
+            slen = S.length,
+            sw;
+        for (var i = 0; i < plen; i++)
+            sw = _streamtoword(key, offp),
+            offp = sw.offp,
             P[i] = P[i] ^ sw.key;
-        }
         offp = 0;
-        for (i = 0; i < plen; i += 2) {
-            sw = _streamtoword(data, offp);
-            offp = sw.offp;
-            lr[0] ^= sw.key;
-
-            sw = _streamtoword(data, offp);
-            offp = sw.offp;
-            lr[1] ^= sw.key;
-
-            lr = _encipher(lr, 0, P, S);
-            P[i] = lr[0];
+        for (i = 0; i < plen; i += 2)
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[0] ^= sw.key,
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[1] ^= sw.key,
+            lr = _encipher(lr, 0, P, S),
+            P[i] = lr[0],
             P[i + 1] = lr[1];
-        }
-        for (i = 0; i < slen; i += 2) {
-            sw = _streamtoword(data, offp);
-            offp = sw.offp;
-            lr[0] ^= sw.key;
-
-            sw = _streamtoword(data, offp);
-            offp = sw.offp;
-            lr[1] ^= sw.key;
-
-            lr = _encipher(lr, 0, P, S);
-            S[i] = lr[0];
+        for (i = 0; i < slen; i += 2)
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[0] ^= sw.key,
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[1] ^= sw.key,
+            lr = _encipher(lr, 0, P, S),
+            S[i] = lr[0],
             S[i + 1] = lr[1];
-        }
     }
 
     /**
@@ -688,14 +675,12 @@
      */
     function _nextTick(callback) {
         if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
-            if (typeof setImmediate === 'function') {
+            if (typeof setImmediate === 'function')
                 setImmediate(callback);
-            } else {
+            else
                 process.nextTick(callback);
-            }
-        } else {
+        } else
             setTimeout(callback, 0);
-        }
     }
 
     /**
@@ -705,36 +690,37 @@
      * @param {number} rounds Number of rounds
      * @param {function(Error, Array.<number>=)=} callback Callback receiving the error, if any, and the resulting bytes. If
      *  omitted, the operation will be performed synchronously.
+     *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {!Array.<number>|undefined} Resulting bytes if callback has been omitted, otherwise `undefined`
      * @private
      */
-    function _crypt(b, salt, rounds, callback) {
+    function _crypt(b, salt, rounds, callback, progressCallback) {
         var cdata = C_ORIG.slice(),
             clen = cdata.length,
             err;
 
         // Validate
         if (rounds < 4 || rounds > 31) {
-            err = new Error("Illegal number of rounds: "+rounds);
+            err = Error("Illegal number of rounds: "+rounds);
             if (callback) {
                 _nextTick(callback.bind(this, err));
                 return;
-            } else throw err;
+            } else
+                throw err;
         }
-        if (salt.length != BCRYPT_SALT_LEN) {
-            err = new Error("Illegal salt length: "+salt.length+" != "+BCRYPT_SALT_LEN);
+        if (salt.length !== BCRYPT_SALT_LEN) {
+            err =Error("Illegal salt length: "+salt.length+" != "+BCRYPT_SALT_LEN);
             if (callback) {
                 _nextTick(callback.bind(this, err));
                 return;
-            } else throw err;
+            } else
+                throw err;
         }
         rounds = 1 << rounds;
-        var P = P_ORIG.slice();
-        var S = S_ORIG.slice();
-
+        var P = P_ORIG.slice(),
+            S = S_ORIG.slice(),
+            i = 0, j;
         _ekskey(salt, b, P, S);
-
-        var i = 0, j;
 
         /**
          * Calcualtes the next round.
@@ -742,39 +728,35 @@
          * @private
          */
         function next() {
+            if (progressCallback)
+                progressCallback(i/rounds);
             if (i < rounds) {
                 var start = new Date();
                 for (; i < rounds;) {
                     i = i + 1;
                     _key(b, P, S);
                     _key(salt, P, S);
-                    if (Date.now() - start > MAX_EXECUTION_TIME) { // TODO (dcode): Is this necessary?
+                    if (Date.now() - start > MAX_EXECUTION_TIME)
                         break;
-                    }
                 }
             } else {
-                for (i = 0; i < 64; i++) {
-                    for (j = 0; j < (clen >> 1); j++) {
+                for (i = 0; i < 64; i++)
+                    for (j = 0; j < (clen >> 1); j++)
                         _encipher(cdata, j << 1, P, S);
-                    }
-                }
                 var ret = [];
-                for (i = 0; i < clen; i++) {
-                    ret.push(((cdata[i] >> 24) & 0xff) >>> 0);
-                    ret.push(((cdata[i] >> 16) & 0xff) >>> 0);
-                    ret.push(((cdata[i] >> 8) & 0xff) >>> 0);
+                for (i = 0; i < clen; i++)
+                    ret.push(((cdata[i] >> 24) & 0xff) >>> 0),
+                    ret.push(((cdata[i] >> 16) & 0xff) >>> 0),
+                    ret.push(((cdata[i] >> 8) & 0xff) >>> 0),
                     ret.push((cdata[i] & 0xff) >>> 0);
-                }
                 if (callback) {
                     callback(null, ret);
                     return;
-                } else {
+                } else
                     return ret;
-                }
             }
-            if (callback) {
+            if (callback)
                 _nextTick(next);
-            }
         }
 
         // Async
@@ -784,21 +766,21 @@
          // Sync
         } else {
             var res;
-            while (true) {
-                if ((res = next()) !== undefined) {
+            while (true)
+                if (typeof(res = next()) !== 'undefined')
                     return res || [];
-                }
-            }
         }
     }
 
     function _stringToBytes(str) {
-        var cp, out = [];
+        var cp,
+            out = [];
         for (var i=0; i<str.length; i++) {
             cp = str.charCodeAt(i);
             if (cp >= 0xD800 && cp <= 0xDFFF) {
                 cp = str.codePointAt(i);
-                if (cp > 0xFFFF) i++;
+                if (cp > 0xFFFF)
+                    i++;
             }
             utf8_encode_char(cp, out);
         }
@@ -811,18 +793,20 @@
      * @param {?string} salt Salt to use, actually never null
      * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash. If omitted,
      *  hashing is perormed synchronously.
+     *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
      * @private
      */
-    function _hash(s, salt, callback) {
+    function _hash(s, salt, callback, progressCallback) {
         var err;
         if (typeof s !== 'string' || typeof salt !== 'string') {
-            err = new Error("Invalid string / salt: Not a string");
+            err = Error("Invalid string / salt: Not a string");
             if (callback) {
                 _nextTick(callback.bind(this, err));
                 return;
             }
-            else throw err;
+            else
+                throw err;
         }
         
         // Validate the salt
@@ -833,39 +817,42 @@
                 _nextTick(callback.bind(this, err));
                 return;
             }
-            else throw err;
+            else
+                throw err;
         }
-        if (salt.charAt(2) === '$') {
-            minor = String.fromCharCode(0);
+        if (salt.charAt(2) === '$')
+            minor = String.fromCharCode(0),
             offset = 3;
-        } else {
+        else {
             minor = salt.charAt(2);
             if ((minor !== 'a' && minor !== 'y') || salt.charAt(3) !== '$') {
-                err = new Error("Invalid salt revision: "+salt.substring(2,4));
+                err = Error("Invalid salt revision: "+salt.substring(2,4));
                 if (callback) {
                     _nextTick(callback.bind(this, err));
                     return;
-                } else throw err;
+                } else
+                    throw err;
             }
             offset = 4;
         }
 
         // Extract number of rounds
         if (salt.charAt(offset + 2) > '$') {
-            err = new Error("Missing salt rounds");
+            err = Error("Missing salt rounds");
             if (callback) {
                 _nextTick(callback.bind(this, err));
                 return;
-            } else throw err;
+            } else
+                throw err;
         }
-        var r1 = parseInt(salt.substring(offset, offset + 1), 10) * 10;
-        var r2 = parseInt(salt.substring(offset + 1, offset + 2), 10);
-        var rounds = r1 + r2;
-        var real_salt = salt.substring(offset + 3, offset + 25);
+        var r1 = parseInt(salt.substring(offset, offset + 1), 10) * 10,
+            r2 = parseInt(salt.substring(offset + 1, offset + 2), 10),
+            rounds = r1 + r2,
+            real_salt = salt.substring(offset + 3, offset + 25);
         s += minor >= 'a' ? "\x00" : "";
 
-        var passwordb = _stringToBytes(s);
-        var saltb = [];
+        var passwordb = _stringToBytes(s),
+            saltb = [];
         saltb = base64_decode(real_salt, BCRYPT_SALT_LEN);
 
         /**
@@ -877,9 +864,11 @@
         function finish(bytes) {
             var res = [];
             res.push("$2");
-            if (minor >= 'a') res.push(minor);
+            if (minor >= 'a')
+                res.push(minor);
             res.push("$");
-            if (rounds < 10) res.push("0");
+            if (rounds < 10)
+                res.push("0");
             res.push(rounds.toString());
             res.push("$");
             res.push(base64_encode(saltb, saltb.length));
@@ -888,18 +877,17 @@
         }
 
         // Sync
-        if (typeof callback == 'undefined') {
+        if (typeof callback == 'undefined')
             return finish(_crypt(passwordb, saltb, rounds));
 
         // Async
-        } else {
+        else {
             _crypt(passwordb, saltb, rounds, function(err, bytes) {
-                if (err) {
+                if (err)
                     callback(err, null);
-                } else {
+                else
                     callback(null, finish(bytes));
-                }
-            });
+            }, progressCallback);
         }
     }
 
@@ -911,20 +899,18 @@
      */
     function _randomBytes(len) {
         // node.js, see: http://nodejs.org/api/crypto.html
-        if (typeof module !== 'undefined' && module.exports) {
-            var crypto = require("crypto");
-            return crypto.randomBytes(len);
+        if (typeof module !== 'undefined' && module.exports)
+            return require("crypto")['randomBytes'](len);
             
         // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
-        } else {
+        else {
             var array = new Uint32Array(len);
-            if (global.crypto && typeof global.crypto.getRandomValues === 'function') {
+            if (global.crypto && typeof global.crypto.getRandomValues === 'function')
                 global.crypto.getRandomValues(array);
-            } else if (typeof _getRandomValues === 'function') {
+            else if (typeof _getRandomValues === 'function')
                 _getRandomValues(array);
-            } else {
-                throw(new Error("Failed to generate random values: Web Crypto API not available / polyfill not set through bcrypt.setRandomPolyfill"));
-            }
+            else
+                throw Error("Failed to generate random values: Web Crypto API not available / polyfill not set through bcrypt.setRandomPolyfill");
             return Array.prototype.slice.call(array);
         }
     }
@@ -938,20 +924,16 @@
      */
     function _gensalt(rounds) {
         rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
-        if (rounds < 4 || rounds > 31) {
-            throw(new Error("Illegal number of rounds: "+rounds));
-        }
+        if (rounds < 4 || rounds > 31)
+            throw Error("Illegal number of rounds: "+rounds);
         var salt = [];
         salt.push("$2a$");
-        if (rounds < 10) salt.push("0");
+        if (rounds < 10)
+            salt.push("0");
         salt.push(rounds.toString());
         salt.push('$');
-        try {
-            salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN));
-            return salt.join('');
-        } catch(err) {
-            throw(err);
-        }
+        salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+        return salt.join('');
     }
     
     // crypto.getRandomValues polyfill to use
@@ -977,7 +959,7 @@
         if (typeof rounds === 'undefined')
             rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
         else if (typeof rounds !== 'number')
-            throw(new Error("Illegal argument types: "+(typeof rounds)+", "+(typeof seed_length)));
+            throw Error("Illegal argument types: "+(typeof rounds)+", "+(typeof seed_length));
         return _gensalt(rounds);
     };
 
@@ -989,24 +971,22 @@
      * @expose
      */
     bcrypt.genSalt = function(rounds, seed_length, callback) {
-        if (typeof seed_length === 'function') {
-            callback = seed_length;
+        if (typeof seed_length === 'function')
+            callback = seed_length,
             seed_length = undefined; // Not supported.
-        }
-        if (typeof rounds === 'function') {
-            callback = rounds;
+        if (typeof rounds === 'function')
+            callback = rounds,
             rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
-        }
         if (typeof callback !== 'function')
-            throw(new Error("Illegal callback: "+callback));
+            throw Error("Illegal callback: "+callback);
         if (typeof rounds !== 'number') {
-            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof rounds))));
+            _nextTick(callback.bind(this, Error("Illegal argument types: "+(typeof rounds))));
             return;
         }
         _nextTick(function() { // Pretty thin, but salting is fast enough
             try {
                 callback(null, bcrypt.genSaltSync(rounds));
-            } catch(err) {
+            } catch (err) {
                 callback(err);
             }
         });
@@ -1025,7 +1005,7 @@
         if (typeof salt === 'number')
             salt = bcrypt.genSaltSync(salt);
         if (typeof s !== 'string' || typeof salt !== 'string')
-            throw new Error("Illegal argument types: "+(typeof s)+', '+(typeof salt));
+            throw Error("Illegal argument types: "+(typeof s)+', '+(typeof salt));
         return _hash(s, salt);
     };
 
@@ -1034,20 +1014,20 @@
      * @param {string} s String to hash
      * @param {number|string} salt Salt length to generate or salt to use
      * @param {function(Error, string=)} callback Callback receiving the error, if any, and the resulting hash
+     * @param {function(number)=} progressCallback Callback called with the current progress
      * @expose
      */
-    bcrypt.hash = function(s, salt, callback) {
+    bcrypt.hash = function(s, salt, callback, progressCallback) {
         if (typeof callback !== 'function')
-            throw(new Error("Illegal callback: "+callback));
-        if (typeof s === 'string' && typeof salt === 'number') {
+            throw Error("Illegal callback: "+callback);
+        if (typeof s === 'string' && typeof salt === 'number')
             bcrypt.genSalt(salt, function(err, salt) {
-                _hash(s, salt, callback);
+                _hash(s, salt, callback, progressCallback);
             });
-        } else if (typeof s === 'string' && typeof salt === 'string') {
-            _hash(s, salt, callback);
-        } else {
-            _nextTick(callback.bind(this, new Error("Illegal argument types: "+(typeof s)+', '+(typeof salt))));
-        }
+        else if (typeof s === 'string' && typeof salt === 'string')
+            _hash(s, salt, callback, progressCallback);
+        else
+            _nextTick(callback.bind(this, Error("Illegal argument types: "+(typeof s)+', '+(typeof salt))));
     };
 
     /**
@@ -1060,19 +1040,17 @@
      */
     bcrypt.compareSync = function(s, hash) {
         if (typeof s !== "string" || typeof hash !== "string")
-            throw(new Error("Illegal argument types: "+(typeof s)+', '+(typeof hash)));
-        if (hash.length !== 60) return false;
-        var comp = bcrypt.hashSync(s, hash.substr(0, hash.length-31));
-        var same = comp.length === hash.length;
-        var max_length = (comp.length < hash.length) ? comp.length : hash.length;
-
+            throw Error("Illegal argument types: "+(typeof s)+', '+(typeof hash));
+        if (hash.length !== 60)
+            return false;
+        var comp = bcrypt.hashSync(s, hash.substr(0, hash.length-31)),
+            same = comp.length === hash.length,
+            max_length = (comp.length < hash.length) ? comp.length : hash.length;
         // to prevent timing attacks, should check entire string
         // don't exit after found to be false
-        for (var i = 0; i < max_length; ++i) {
-            if (comp.length >= i && hash.length >= i && comp[i] != hash[i]) {
+        for (var i = 0; i < max_length; ++i)
+            if (comp.length >= i && hash.length >= i && comp[i] != hash[i])
                 same = false;
-            }
-        }
         return same;
     };
 
@@ -1081,10 +1059,11 @@
      * @param {string} s Data to compare
      * @param {string} hash Data to be compared to
      * @param {function(Error, boolean)} callback Callback receiving the error, if any, otherwise the result
+     * @param {function(number)=} progressCallback Callback called with the current progress
      * @throws {Error} If the callback argument is invalid
      * @expose
      */
-    bcrypt.compare = function(s, hash, callback) {
+    bcrypt.compare = function(s, hash, callback, progressCallback) {
         if (typeof callback !== 'function')
             throw(new Error("Illegal callback: "+callback));
         if (typeof s !== "string" || typeof hash !== "string") {
@@ -1093,7 +1072,7 @@
         }
         bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
             callback(err, hash === comp);
-        });
+        }, progressCallback);
     };
 
     /**
@@ -1105,7 +1084,7 @@
      */
     bcrypt.getRounds = function(hash) {
         if (typeof hash !== "string")
-            throw(new Error("Illegal argument types: "+(typeof hash)));
+            throw Error("Illegal argument types: "+(typeof hash));
         return parseInt(hash.split("$")[2], 10);
     };
 
@@ -1118,23 +1097,18 @@
      */
     bcrypt.getSalt = function(hash) {
         if (typeof hash !== 'string')
-            throw(new Error("Illegal argument types: "+(typeof hash)));
+            throw Error("Illegal argument types: "+(typeof hash));
         if (hash.length !== 60)
-            throw(new Error("Illegal hash length: "+hash.length+" != 60"));
+            throw Error("Illegal hash length: "+hash.length+" != 60");
         return hash.substring(0, 29);
     };
 
-    // Enable module loading if available
-    if (typeof module !== 'undefined' && module["exports"]) { // CommonJS
+    /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;
-    } else if (typeof define !== 'undefined' && define["amd"]) { // AMD
+    /* AMD */ else if (typeof define !== 'undefined' && define["amd"])
         define("bcrypt", function() { return bcrypt; });
-    } else { // Shim
-        if (!global["dcodeIO"]) {
-            global["dcodeIO"] = {};
-        }
-        global["dcodeIO"]["bcrypt"] = bcrypt;
-    }
+    /* Global */ else
+        (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = bcrypt;
     
 })(this);
 
