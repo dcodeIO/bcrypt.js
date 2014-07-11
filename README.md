@@ -114,12 +114,12 @@ API
 ---
 
   - [bcrypt](#bcrypt)
-  - [bcrypt.genSaltSync(rounds\*, seed_length\*)](#bcryptgensaltsyncrounds-seed_length)
-  - [bcrypt.genSalt(rounds\*, seed_length\*, callback\*)](#bcryptgensaltrounds-seed_length-callback)
-  - [bcrypt.hashSync(s, salt\*)](#bcrypthashsyncs-salt)
-  - [bcrypt.hash(s, salt, callback)](#bcrypthashs-salt-callback)
+  - [bcrypt.genSaltSync(rounds=, seed_length=)](#bcryptgensaltsyncrounds-seed_length)
+  - [bcrypt.genSalt(rounds=, seed_length=, callback)](#bcryptgensaltrounds-seed_length-callback)
+  - [bcrypt.hashSync(s, salt=)](#bcrypthashsyncs-salt)
+  - [bcrypt.hash(s, salt, callback, progressCallback=)](#bcrypthashs-salt-callback-progresscallback)
   - [bcrypt.compareSync(s, hash)](#bcryptcomparesyncs-hash)
-  - [bcrypt.compare(s, hash, callback)](#bcryptcompares-hash-callback)
+  - [bcrypt.compare(s, hash, callback, progressCallback=)](#bcryptcompares-hash-callback-progresscallback)
   - [bcrypt.getRounds(hash)](#bcryptgetroundshash)
   - [bcrypt.getSalt(hash)](#bcryptgetsalthash)
 
