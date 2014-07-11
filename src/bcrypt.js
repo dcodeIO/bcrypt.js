@@ -33,10 +33,6 @@
  */
 (function(global) {
     "use strict";
-
-    // #include "base64/native.js"
-    
-    // #include "utf8/native.js"
     
     /**
      * bcrypt namespace.
@@ -857,6 +853,10 @@
             throw Error("Illegal hash length: "+hash.length+" != 60");
         return hash.substring(0, 29);
     };
+
+    // #include "base64/native.js"
+
+    // #include "utf8/native.js"
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;

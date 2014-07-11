@@ -33,258 +33,7 @@
  */
 (function(global) {
     "use strict";
-
-    /**
-     * @type {Array.<string>}
-     * @const
-     * @private
-     **/
-    var BASE64_CODE = ['.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-        'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-        'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8',
-        '9'];
     
-    /**
-     * @type {Array.<number>}
-     * @const
-     * @private
-     **/
-    var BASE64_INDEX = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1,
-        54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1, -1,
-        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31,
-        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
-    
-    /**
-     * Encodes a byte array to base64 with up to len bytes of input.
-     * @param {Array.<number>} b Byte array
-     * @param {number} len Maximum input length
-     * @returns {string}
-     */
-    function base64_encode(b, len) {
-        var off = 0;
-        var rs = [];
-        var c1;
-        var c2;
-        if (len <= 0 || len > b.length) {
-            throw(new Error("Invalid 'len': "+len));
-        }
-        while (off < len) {
-            c1 = b[off++] & 0xff;
-            rs.push(BASE64_CODE[(c1 >> 2) & 0x3f]);
-            c1 = (c1 & 0x03) << 4;
-            if (off >= len) {
-                rs.push(BASE64_CODE[c1 & 0x3f]);
-                break;
-            }
-            c2 = b[off++] & 0xff;
-            c1 |= (c2 >> 4) & 0x0f;
-            rs.push(BASE64_CODE[c1 & 0x3f]);
-            c1 = (c2 & 0x0f) << 2;
-            if (off >= len) {
-                rs.push(BASE64_CODE[c1 & 0x3f]);
-                break;
-            }
-            c2 = b[off++] & 0xff;
-            c1 |= (c2 >> 6) & 0x03;
-            rs.push(BASE64_CODE[c1 & 0x3f]);
-            rs.push(BASE64_CODE[c2 & 0x3f]);
-        }
-        return rs.join('');
-    }
-    
-    /**
-     * Decodes a base64 encoded string to up to len bytes of output.
-     * @param {string} s String to decode
-     * @param {number} len Maximum output length
-     * @returns {Array.<number>}
-     */
-    function base64_decode(s, len) {
-        var off = 0;
-        var slen = s.length;
-        var olen = 0;
-        var rs = [];
-        var c1, c2, c3, c4, o, code;
-        if (len <= 0) throw(new Error("Illegal 'len': "+len));
-        while (off < slen - 1 && olen < len) {
-            code = s.charCodeAt(off++);
-            c1 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            code = s.charCodeAt(off++);
-            c2 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            if (c1 == -1 || c2 == -1) {
-                break;
-            }
-            o = (c1 << 2) >>> 0;
-            o |= (c2 & 0x30) >> 4;
-            rs.push(String.fromCharCode(o));
-            if (++olen >= len || off >= slen) {
-                break;
-            }
-            code = s.charCodeAt(off++);
-            c3 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            if (c3 == -1) {
-                break;
-            }
-            o = ((c2 & 0x0f) << 4) >>> 0;
-            o |= (c3 & 0x3c) >> 2;
-            rs.push(String.fromCharCode(o));
-            if (++olen >= len || off >= slen) {
-                break;
-            }
-            code = s.charCodeAt(off++);
-            c4 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            o = ((c3 & 0x03) << 6) >>> 0;
-            o |= c4;
-            rs.push(String.fromCharCode(o));
-            ++olen;
-        }
-        var res = [];
-        for (off = 0; off<olen; off++) {
-            res.push(rs[off].charCodeAt(0));
-        }
-        return res;
-    }
-        
-    // ref: http://mths.be/fromcodepoint v0.1.0 by @mathias
-    /* if (!String.fromCodePoint) {
-        (function () {
-            var defineProperty = (function () {
-                // IE 8 only supports `Object.defineProperty` on DOM elements
-                try {
-                    var object = {};
-                    var $defineProperty = Object.defineProperty;
-                    var result = $defineProperty(object, object, object) && $defineProperty;
-                } catch (error) {
-                }
-                return result;
-            }());
-            var stringFromCharCode = String.fromCharCode;
-            var floor = Math.floor;
-            var fromCodePoint = function () {
-                var MAX_SIZE = 0x4000;
-                var codeUnits = [];
-                var highSurrogate;
-                var lowSurrogate;
-                var index = -1;
-                var length = arguments.length;
-                if (!length)
-                    return '';
-                var result = '';
-                while (++index < length) {
-                    var codePoint = Number(arguments[index]);
-                    if (
-                        !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
-                            codePoint < 0 || // not a valid Unicode code point
-                            codePoint > 0x10FFFF || // not a valid Unicode code point
-                            floor(codePoint) != codePoint // not an integer
-                        ) {
-                        throw RangeError('Invalid code point: ' + codePoint);
-                    }
-                    if (codePoint <= 0xFFFF) { // BMP code point
-                        codeUnits.push(codePoint);
-                    } else { // Astral code point; split in surrogate halves
-                        // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-                        codePoint -= 0x10000;
-                        highSurrogate = (codePoint >> 10) + 0xD800;
-                        lowSurrogate = (codePoint % 0x400) + 0xDC00;
-                        codeUnits.push(highSurrogate, lowSurrogate);
-                    }
-                    if (index + 1 == length || codeUnits.length > MAX_SIZE) {
-                        result += stringFromCharCode.apply(null, codeUnits);
-                        codeUnits.length = 0;
-                    }
-                }
-                return result;
-            };
-            if (defineProperty) {
-                defineProperty(String, 'fromCodePoint', {
-                    'value': fromCodePoint,
-                    'configurable': true,
-                    'writable': true
-                });
-            } else {
-                String["fromCodePoint"] = fromCodePoint;
-            }
-        }());
-    } */
-    
-    // ref: http://mths.be/codepointat v0.1.0 by @mathias
-    if (!String.prototype.codePointAt) {
-        (function() {
-            'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
-            var codePointAt = function(position) {
-                if (this == null) {
-                    throw TypeError();
-                }
-                var string = String(this);
-                var size = string.length;
-                // `ToInteger`
-                var index = position ? Number(position) : 0;
-                if (index != index) { // better `isNaN`
-                    index = 0;
-                }
-                // Account for out-of-bounds indices:
-                if (index < 0 || index >= size) {
-                    return undefined;
-                }
-                // Get the first code unit
-                var first = string.charCodeAt(index);
-                var second;
-                if ( // check if it’s the start of a surrogate pair
-                    first >= 0xD800 && first <= 0xDBFF && // high surrogate
-                        size > index + 1 // there is a next code unit
-                    ) {
-                    second = string.charCodeAt(index + 1);
-                    if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-                        // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-                        return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
-                    }
-                }
-                return first;
-            };
-            if (Object.defineProperty) {
-                Object.defineProperty(String.prototype, 'codePointAt', {
-                    'value': codePointAt,
-                    'configurable': true,
-                    'writable': true
-                });
-            } else {
-                String.prototype["codePointAt"] = codePointAt;
-            }
-        }());
-    }
-        
-    /**
-     * Encodes a unicode code point to bytes.
-     * @param {number} codePoint Code point to encode
-     * @param {Array.<number>} out Output array
-     */
-    function utf8_encode_char(codePoint, out) {
-        if (codePoint < 0)
-            throw RangeError("Illegal code point: "+codePoint);
-        if (codePoint < 0x80) {
-            out.push(  codePoint     &0x7F);
-        } else if (codePoint < 0x800) {
-            out.push(((codePoint>>6 )&0x1F)|0xC0);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else if (codePoint < 0x10000) {
-            out.push(((codePoint>>12)&0x0F)|0xE0);
-            out.push(((codePoint>>6 )&0x3F)|0x80);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else if (codePoint < 0x110000) {
-            out.push(((codePoint>>18)&0x07)|0xF0);
-            out.push(((codePoint>>12)&0x3F)|0x80);
-            out.push(((codePoint>>6 )&0x3F)|0x80);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else
-            throw RangeError("Illegal code point: "+codePoint);
-    }
-        
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -1105,6 +854,257 @@
         return hash.substring(0, 29);
     };
 
+    /**
+     * @type {Array.<string>}
+     * @const
+     * @private
+     **/
+    var BASE64_CODE = ['.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+        'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8',
+        '9'];
+    
+    /**
+     * @type {Array.<number>}
+     * @const
+     * @private
+     **/
+    var BASE64_INDEX = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1,
+        54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1, -1,
+        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+        49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
+    
+    /**
+     * Encodes a byte array to base64 with up to len bytes of input.
+     * @param {Array.<number>} b Byte array
+     * @param {number} len Maximum input length
+     * @returns {string}
+     */
+    function base64_encode(b, len) {
+        var off = 0;
+        var rs = [];
+        var c1;
+        var c2;
+        if (len <= 0 || len > b.length) {
+            throw(new Error("Invalid 'len': "+len));
+        }
+        while (off < len) {
+            c1 = b[off++] & 0xff;
+            rs.push(BASE64_CODE[(c1 >> 2) & 0x3f]);
+            c1 = (c1 & 0x03) << 4;
+            if (off >= len) {
+                rs.push(BASE64_CODE[c1 & 0x3f]);
+                break;
+            }
+            c2 = b[off++] & 0xff;
+            c1 |= (c2 >> 4) & 0x0f;
+            rs.push(BASE64_CODE[c1 & 0x3f]);
+            c1 = (c2 & 0x0f) << 2;
+            if (off >= len) {
+                rs.push(BASE64_CODE[c1 & 0x3f]);
+                break;
+            }
+            c2 = b[off++] & 0xff;
+            c1 |= (c2 >> 6) & 0x03;
+            rs.push(BASE64_CODE[c1 & 0x3f]);
+            rs.push(BASE64_CODE[c2 & 0x3f]);
+        }
+        return rs.join('');
+    }
+    
+    /**
+     * Decodes a base64 encoded string to up to len bytes of output.
+     * @param {string} s String to decode
+     * @param {number} len Maximum output length
+     * @returns {Array.<number>}
+     */
+    function base64_decode(s, len) {
+        var off = 0;
+        var slen = s.length;
+        var olen = 0;
+        var rs = [];
+        var c1, c2, c3, c4, o, code;
+        if (len <= 0) throw(new Error("Illegal 'len': "+len));
+        while (off < slen - 1 && olen < len) {
+            code = s.charCodeAt(off++);
+            c1 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
+            code = s.charCodeAt(off++);
+            c2 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
+            if (c1 == -1 || c2 == -1) {
+                break;
+            }
+            o = (c1 << 2) >>> 0;
+            o |= (c2 & 0x30) >> 4;
+            rs.push(String.fromCharCode(o));
+            if (++olen >= len || off >= slen) {
+                break;
+            }
+            code = s.charCodeAt(off++);
+            c3 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
+            if (c3 == -1) {
+                break;
+            }
+            o = ((c2 & 0x0f) << 4) >>> 0;
+            o |= (c3 & 0x3c) >> 2;
+            rs.push(String.fromCharCode(o));
+            if (++olen >= len || off >= slen) {
+                break;
+            }
+            code = s.charCodeAt(off++);
+            c4 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
+            o = ((c3 & 0x03) << 6) >>> 0;
+            o |= c4;
+            rs.push(String.fromCharCode(o));
+            ++olen;
+        }
+        var res = [];
+        for (off = 0; off<olen; off++) {
+            res.push(rs[off].charCodeAt(0));
+        }
+        return res;
+    }
+    
+    // ref: http://mths.be/fromcodepoint v0.1.0 by @mathias
+    /* if (!String.fromCodePoint) {
+        (function () {
+            var defineProperty = (function () {
+                // IE 8 only supports `Object.defineProperty` on DOM elements
+                try {
+                    var object = {};
+                    var $defineProperty = Object.defineProperty;
+                    var result = $defineProperty(object, object, object) && $defineProperty;
+                } catch (error) {
+                }
+                return result;
+            }());
+            var stringFromCharCode = String.fromCharCode;
+            var floor = Math.floor;
+            var fromCodePoint = function () {
+                var MAX_SIZE = 0x4000;
+                var codeUnits = [];
+                var highSurrogate;
+                var lowSurrogate;
+                var index = -1;
+                var length = arguments.length;
+                if (!length)
+                    return '';
+                var result = '';
+                while (++index < length) {
+                    var codePoint = Number(arguments[index]);
+                    if (
+                        !isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
+                            codePoint < 0 || // not a valid Unicode code point
+                            codePoint > 0x10FFFF || // not a valid Unicode code point
+                            floor(codePoint) != codePoint // not an integer
+                        ) {
+                        throw RangeError('Invalid code point: ' + codePoint);
+                    }
+                    if (codePoint <= 0xFFFF) { // BMP code point
+                        codeUnits.push(codePoint);
+                    } else { // Astral code point; split in surrogate halves
+                        // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                        codePoint -= 0x10000;
+                        highSurrogate = (codePoint >> 10) + 0xD800;
+                        lowSurrogate = (codePoint % 0x400) + 0xDC00;
+                        codeUnits.push(highSurrogate, lowSurrogate);
+                    }
+                    if (index + 1 == length || codeUnits.length > MAX_SIZE) {
+                        result += stringFromCharCode.apply(null, codeUnits);
+                        codeUnits.length = 0;
+                    }
+                }
+                return result;
+            };
+            if (defineProperty) {
+                defineProperty(String, 'fromCodePoint', {
+                    'value': fromCodePoint,
+                    'configurable': true,
+                    'writable': true
+                });
+            } else {
+                String["fromCodePoint"] = fromCodePoint;
+            }
+        }());
+    } */
+    
+    // ref: http://mths.be/codepointat v0.1.0 by @mathias
+    if (!String.prototype.codePointAt) {
+        (function() {
+            'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
+            var codePointAt = function(position) {
+                if (this == null) {
+                    throw TypeError();
+                }
+                var string = String(this);
+                var size = string.length;
+                // `ToInteger`
+                var index = position ? Number(position) : 0;
+                if (index != index) { // better `isNaN`
+                    index = 0;
+                }
+                // Account for out-of-bounds indices:
+                if (index < 0 || index >= size) {
+                    return undefined;
+                }
+                // Get the first code unit
+                var first = string.charCodeAt(index);
+                var second;
+                if ( // check if it’s the start of a surrogate pair
+                    first >= 0xD800 && first <= 0xDBFF && // high surrogate
+                        size > index + 1 // there is a next code unit
+                    ) {
+                    second = string.charCodeAt(index + 1);
+                    if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+                        // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                        return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+                    }
+                }
+                return first;
+            };
+            if (Object.defineProperty) {
+                Object.defineProperty(String.prototype, 'codePointAt', {
+                    'value': codePointAt,
+                    'configurable': true,
+                    'writable': true
+                });
+            } else {
+                String.prototype["codePointAt"] = codePointAt;
+            }
+        }());
+    }
+        
+    /**
+     * Encodes a unicode code point to bytes.
+     * @param {number} codePoint Code point to encode
+     * @param {Array.<number>} out Output array
+     */
+    function utf8_encode_char(codePoint, out) {
+        if (codePoint < 0)
+            throw RangeError("Illegal code point: "+codePoint);
+        if (codePoint < 0x80) {
+            out.push(  codePoint     &0x7F);
+        } else if (codePoint < 0x800) {
+            out.push(((codePoint>>6 )&0x1F)|0xC0);
+            out.push(( codePoint     &0x3F)|0x80);
+        } else if (codePoint < 0x10000) {
+            out.push(((codePoint>>12)&0x0F)|0xE0);
+            out.push(((codePoint>>6 )&0x3F)|0x80);
+            out.push(( codePoint     &0x3F)|0x80);
+        } else if (codePoint < 0x110000) {
+            out.push(((codePoint>>18)&0x07)|0xF0);
+            out.push(((codePoint>>12)&0x3F)|0x80);
+            out.push(((codePoint>>6 )&0x3F)|0x80);
+            out.push(( codePoint     &0x3F)|0x80);
+        } else
+            throw RangeError("Illegal code point: "+codePoint);
+    }
+    
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;
     /* AMD */ else if (typeof define !== 'undefined' && define["amd"])
