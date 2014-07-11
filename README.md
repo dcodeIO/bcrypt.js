@@ -127,32 +127,32 @@ API
 bcrypt namespace.
 
 
-### bcrypt.genSaltSync(rounds\*, seed_length\*)
+### bcrypt.genSaltSync(rounds=, seed_length=)
 Synchronously generates a salt.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| rounds\* | number | Number of rounds to use, defaults to 10 if omitted |
-| seed_length\* | number | Not supported. |
+| rounds | number | Number of rounds to use, defaults to 10 if omitted |
+| seed_length | number | Not supported. |
 |   |||
 | **returns** | string | Resulting salt
 
-### bcrypt.genSalt(rounds\*, seed_length\*, callback\*)
+### bcrypt.genSalt(rounds=, seed_length=, callback)
 Asynchronously generates a salt.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| rounds\* | (number &#166; function(Error, ?string)) | Number of rounds to use, defaults to 10 if omitted |
-| seed_length\* | (number &#166; function(Error, ?string)) | Not supported. |
-| callback\* | function(Error, ?string) | Callback receiving the error, if any, and the resulting salt |
+| rounds | (number &#166; function(Error, ?string)) | Number of rounds to use, defaults to 10 if omitted |
+| seed_length | (number &#166; function(Error, ?string)) | Not supported. |
+| callback | function(Error, ?string) | Callback receiving the error, if any, and the resulting salt |
 
-### bcrypt.hashSync(s, salt\*)
+### bcrypt.hashSync(s, salt=)
 Synchronously generates a hash for the given string.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | s | string | String to hash |
-| salt\* | (number &#166; string) | Salt length to generate or salt to use, default to 10 |
+| salt | (number &#166; string) | Salt length to generate or salt to use, default to 10 |
 |   |||
 | **returns** | ?string | Resulting hash, actually never null
 
