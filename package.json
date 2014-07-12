@@ -29,15 +29,16 @@
     "main": "index.js",
     "dependencies": {},
     "devDependencies": {
-        "testjs": "latest",
-        "preprocessor": "latest",
-        "closurecompiler": "latest",
-        "bcrypt": "latest"
+        "testjs": "~1",
+        "closurecompiler": "~1",
+        "metascript": "~0.18",
+        "bcrypt": "latest",
+        "utfx": "~1"
     },
     "license": "Apache-2.0",
     "scripts": {
         "test": "node node_modules/testjs/bin/testjs",
-        "build": "preprocess ./src/bcrypt.js ./src > ./dist/bcrypt.js",
+        "build": "node node_modules/metascript/bin/metascript ./src/bcrypt.js > ./dist/bcrypt.js",
         "compile": "ccjs dist/bcrypt.js --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --output_wrapper=\"(function(){%output%})();\" > dist/bcrypt.min.js",
         "make": "npm run-script build && npm run-script compile && npm test"
     }

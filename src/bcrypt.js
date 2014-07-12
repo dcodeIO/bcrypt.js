@@ -43,35 +43,35 @@
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var BCRYPT_SALT_LEN = 16;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var GENSALT_DEFAULT_LOG2_ROUNDS = 10;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var BLOWFISH_NUM_ROUNDS = 16;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var MAX_EXECUTION_TIME = 100;
 
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var P_ORIG = [
         0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822,
@@ -83,7 +83,7 @@
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var S_ORIG = [
         0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed,
@@ -296,7 +296,7 @@
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var C_ORIG = [
         0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944,
@@ -309,7 +309,7 @@
      * @param {Array.<number>} P
      * @param {Array.<number>} S
      * @returns {Array.<number>}
-     * @private
+     * @inner
      */
     function _encipher(lr, off, P, S) { // This is our bottleneck: 1714/1905 ticks / 90% - see profile.txt
         var n,
@@ -339,7 +339,7 @@
      * @param {Array.<number>} data
      * @param {number} offp
      * @returns {{key: number, offp: number}}
-     * @private
+     * @inner
      */
     function _streamtoword(data, offp) {
         var word = 0;
@@ -354,7 +354,7 @@
      * @param {Array.<number>} key
      * @param {Array.<number>} P
      * @param {Array.<number>} S
-     * @private
+     * @inner
      */
     function _key(key, P, S) {
         var offset = 0,
@@ -382,7 +382,7 @@
      * @param {Array.<number>} key
      * @param {Array.<number>} P
      * @param {Array.<number>} S
-     * @private
+     * @inner
      */
     function _ekskey(data, key, P, S) {
         var offp = 0,
@@ -420,7 +420,7 @@
     /**
      * Continues with the callback on the next tick.
      * @param {function(...[*])} callback Callback to execute
-     * @private
+     * @inner
      */
     function _nextTick(callback) {
         if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
@@ -441,7 +441,7 @@
      *  omitted, the operation will be performed synchronously.
      *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {!Array.<number>|undefined} Resulting bytes if callback has been omitted, otherwise `undefined`
-     * @private
+     * @inner
      */
     function _crypt(b, salt, rounds, callback, progressCallback) {
         var cdata = C_ORIG.slice(),
@@ -474,7 +474,7 @@
         /**
          * Calcualtes the next round.
          * @returns {Array.<number>|undefined} Resulting array if callback has been omitted, otherwise `undefined`
-         * @private
+         * @inner
          */
         function next() {
             if (progressCallback)
@@ -521,18 +521,21 @@
         }
     }
 
+    /**
+     * Converts a JavaScript string to UTF8 bytes.
+     * @param {string} str String
+     * @returns {!Array.<number>} UTF8 bytes
+     * @inner
+     */
     function _stringToBytes(str) {
-        var cp,
-            out = [];
-        for (var i=0; i<str.length; i++) {
-            cp = str.charCodeAt(i);
-            if (cp >= 0xD800 && cp <= 0xDFFF) {
-                cp = str.codePointAt(i);
-                if (cp > 0xFFFF)
-                    i++;
-            }
-            utf8_encode_char(cp, out);
-        }
+        var out = [],
+            i = 0;
+        utfx.encodeUTF16toUTF8(function() {
+            if (i >= str.length) return null;
+            return str.charCodeAt(i++);
+        }, function(b) {
+            out.push(b);
+        });
         return out;
     }
 
@@ -544,7 +547,7 @@
      *  hashing is perormed synchronously.
      *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
-     * @private
+     * @inner
      */
     function _hash(s, salt, callback, progressCallback) {
         var err;
@@ -608,7 +611,7 @@
          * Finishes hashing.
          * @param {Array.<number>} bytes Byte array
          * @returns {string}
-         * @private
+         * @inner
          */
         function finish(bytes) {
             var res = [];
@@ -644,7 +647,7 @@
      * Generates cryptographically secure random bytes.
      * @param {number} len Number of bytes to generate
      * @returns {Array.<number>}
-     * @private
+     * @inner
      */
     function _randomBytes(len) {
         // node.js, see: http://nodejs.org/api/crypto.html
@@ -669,7 +672,7 @@
      * @param {number} rounds Number of rounds to use
      * @returns {string} Salt
      * @throws {Error} If anything goes wrong
-     * @private
+     * @inner
      */
     function _gensalt(rounds) {
         rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
@@ -685,12 +688,16 @@
         return salt.join('');
     }
     
-    // crypto.getRandomValues polyfill to use
+    /**
+     * crypto.getRandomValues polyfill to use
+     * @type {?function(!Uint32Array)}
+     * @inner
+     */
     var _getRandomValues = null;
     
     /**
      * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
-     * @param {function(Uint32Array)} getRandomValues The actual implementation
+     * @param {function(!Uint32Array)} getRandomValues The actual implementation
      * @expose
      */
     bcrypt.setRandomPolyfill = function(getRandomValues) {
@@ -853,10 +860,10 @@
             throw Error("Illegal hash length: "+hash.length+" != 60");
         return hash.substring(0, 29);
     };
-
-    // #include "base64/native.js"
-
-    // #include "utf8/native.js"
+    
+    //? include("../node_modules/utfx/dist/utfx-embeddable.js");
+    
+    //? include("base64/native.js");
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;

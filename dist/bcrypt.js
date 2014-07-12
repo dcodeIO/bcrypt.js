@@ -33,7 +33,7 @@
  */
 (function(global) {
     "use strict";
-    
+
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -43,35 +43,35 @@
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var BCRYPT_SALT_LEN = 16;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var GENSALT_DEFAULT_LOG2_ROUNDS = 10;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var BLOWFISH_NUM_ROUNDS = 16;
 
     /**
      * @type {number}
      * @const
-     * @private
+     * @inner
      */
     var MAX_EXECUTION_TIME = 100;
 
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var P_ORIG = [
         0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822,
@@ -83,7 +83,7 @@
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var S_ORIG = [
         0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed,
@@ -296,7 +296,7 @@
     /**
      * @type {Array.<number>}
      * @const
-     * @private
+     * @inner
      */
     var C_ORIG = [
         0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944,
@@ -309,7 +309,7 @@
      * @param {Array.<number>} P
      * @param {Array.<number>} S
      * @returns {Array.<number>}
-     * @private
+     * @inner
      */
     function _encipher(lr, off, P, S) { // This is our bottleneck: 1714/1905 ticks / 90% - see profile.txt
         var n,
@@ -339,7 +339,7 @@
      * @param {Array.<number>} data
      * @param {number} offp
      * @returns {{key: number, offp: number}}
-     * @private
+     * @inner
      */
     function _streamtoword(data, offp) {
         var word = 0;
@@ -354,7 +354,7 @@
      * @param {Array.<number>} key
      * @param {Array.<number>} P
      * @param {Array.<number>} S
-     * @private
+     * @inner
      */
     function _key(key, P, S) {
         var offset = 0,
@@ -382,7 +382,7 @@
      * @param {Array.<number>} key
      * @param {Array.<number>} P
      * @param {Array.<number>} S
-     * @private
+     * @inner
      */
     function _ekskey(data, key, P, S) {
         var offp = 0,
@@ -420,7 +420,7 @@
     /**
      * Continues with the callback on the next tick.
      * @param {function(...[*])} callback Callback to execute
-     * @private
+     * @inner
      */
     function _nextTick(callback) {
         if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
@@ -441,7 +441,7 @@
      *  omitted, the operation will be performed synchronously.
      *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {!Array.<number>|undefined} Resulting bytes if callback has been omitted, otherwise `undefined`
-     * @private
+     * @inner
      */
     function _crypt(b, salt, rounds, callback, progressCallback) {
         var cdata = C_ORIG.slice(),
@@ -474,7 +474,7 @@
         /**
          * Calcualtes the next round.
          * @returns {Array.<number>|undefined} Resulting array if callback has been omitted, otherwise `undefined`
-         * @private
+         * @inner
          */
         function next() {
             if (progressCallback)
@@ -521,18 +521,21 @@
         }
     }
 
+    /**
+     * Converts a JavaScript string to UTF8 bytes.
+     * @param {string} str String
+     * @returns {!Array.<number>} UTF8 bytes
+     * @inner
+     */
     function _stringToBytes(str) {
-        var cp,
-            out = [];
-        for (var i=0; i<str.length; i++) {
-            cp = str.charCodeAt(i);
-            if (cp >= 0xD800 && cp <= 0xDFFF) {
-                cp = str.codePointAt(i);
-                if (cp > 0xFFFF)
-                    i++;
-            }
-            utf8_encode_char(cp, out);
-        }
+        var out = [],
+            i = 0;
+        utfx.encodeUTF16toUTF8(function() {
+            if (i >= str.length) return null;
+            return str.charCodeAt(i++);
+        }, function(b) {
+            out.push(b);
+        });
         return out;
     }
 
@@ -544,7 +547,7 @@
      *  hashing is perormed synchronously.
      *  @param {function(number)=} progressCallback Callback called with the current progress
      * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
-     * @private
+     * @inner
      */
     function _hash(s, salt, callback, progressCallback) {
         var err;
@@ -557,7 +560,7 @@
             else
                 throw err;
         }
-        
+
         // Validate the salt
         var minor, offset;
         if (salt.charAt(0) !== '$' || salt.charAt(1) !== '2') {
@@ -608,7 +611,7 @@
          * Finishes hashing.
          * @param {Array.<number>} bytes Byte array
          * @returns {string}
-         * @private
+         * @inner
          */
         function finish(bytes) {
             var res = [];
@@ -644,13 +647,13 @@
      * Generates cryptographically secure random bytes.
      * @param {number} len Number of bytes to generate
      * @returns {Array.<number>}
-     * @private
+     * @inner
      */
     function _randomBytes(len) {
         // node.js, see: http://nodejs.org/api/crypto.html
         if (typeof module !== 'undefined' && module.exports)
             return require("crypto")['randomBytes'](len);
-            
+
         // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
         else {
             var array = new Uint32Array(len);
@@ -669,7 +672,7 @@
      * @param {number} rounds Number of rounds to use
      * @returns {string} Salt
      * @throws {Error} If anything goes wrong
-     * @private
+     * @inner
      */
     function _gensalt(rounds) {
         rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
@@ -684,13 +687,17 @@
         salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
         return salt.join('');
     }
-    
-    // crypto.getRandomValues polyfill to use
+
+    /**
+     * crypto.getRandomValues polyfill to use
+     * @type {?function(!Uint32Array)}
+     * @inner
+     */
     var _getRandomValues = null;
-    
+
     /**
      * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
-     * @param {function(Uint32Array)} getRandomValues The actual implementation
+     * @param {function(!Uint32Array)} getRandomValues The actual implementation
      * @expose
      */
     bcrypt.setRandomPolyfill = function(getRandomValues) {
@@ -855,45 +862,243 @@
     };
 
     /**
-     * @type {Array.<string>}
-     * @const
-     * @private
-     **/
-    var BASE64_CODE = ['.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-        'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-        'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8',
-        '9'];
-    
+     * utfx-embeddable (c) 2014 Daniel Wirtz <dcode@dcode.io>
+     * Released under the Apache License, Version 2.0
+     * see: https://github.com/dcodeIO/utfx for details
+     */
+    var utfx = function() {
+        "use strict";
+
+        /**
+         * utfx namespace.
+         * @inner
+         * @type {!Object.<string,*>}
+         */
+        var utfx = {};
+
+        /**
+         * Maximum valid code point.
+         * @type {number}
+         * @const
+         */
+        utfx.MAX_CODEPOINT = 0x10FFFF;
+
+        /**
+         * Encodes UTF8 code points to UTF8 bytes.
+         * @param {(!function():number|null) | number} src Code points source, either as a function returning the next code point
+         *  respectively `null` if there are no more code points left or a single numeric code point.
+         * @param {!function(number)} dst Bytes destination as a function successively called with the next byte
+         */
+        utfx.encodeUTF8 = function(src, dst) {
+            var cp = null;
+            if (typeof src === 'number')
+                cp = src,
+                src = function() { return null; };
+            while (cp !== null || (cp = src()) !== null) {
+                if (cp < 0x80)
+                    dst(cp&0x7F);
+                else if (cp < 0x800)
+                    dst(((cp>>6)&0x1F)|0xC0),
+                    dst((cp&0x3F)|0x80);
+                else if (cp < 0x10000)
+                    dst(((cp>>12)&0x0F)|0xE0),
+                    dst(((cp>>6)&0x3F)|0x80),
+                    dst((cp&0x3F)|0x80);
+                else
+                    dst(((cp>>18)&0x07)|0xF0),
+                    dst(((cp>>12)&0x3F)|0x80),
+                    dst(((cp>>6)&0x3F)|0x80),
+                    dst((cp&0x3F)|0x80);
+                cp = null;
+            }
+        };
+
+        /**
+         * Decodes UTF8 bytes to UTF8 code points.
+         * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if there
+         *  are no more bytes left.
+         * @param {!function(number)} dst Code points destination as a function successively called with each decoded code point.
+         * @throws {RangeError} If a starting byte is invalid in UTF8
+         * @throws {Error} If the last sequence is truncated. Has an array property `bytes` holding the
+         *  remaining bytes.
+         */
+        utfx.decodeUTF8 = function(src, dst) {
+            var a, b, c, d, fail = function(b) {
+                b = b.slice(0, b.indexOf(null));
+                var err = Error(b.toString());
+                err.name = "TruncatedError";
+                err['bytes'] = b;
+                throw err;
+            };
+            while ((a = src()) !== null) {
+                if ((a&0x80) === 0)
+                    dst(a);
+                else if ((a&0xE0) === 0xC0)
+                    ((b = src()) === null) && fail([a, b]),
+                    dst(((a&0x1F)<<6) | (b&0x3F));
+                else if ((a&0xF0) === 0xE0)
+                    ((b=src()) === null || (c=src()) === null) && fail([a, b, c]),
+                    dst(((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F));
+                else if ((a&0xF8) === 0xF0)
+                    ((b=src()) === null || (c=src()) === null || (d=src()) === null) && fail([a, b, c ,d]),
+                    dst(((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F));
+                else throw RangeError("Illegal starting byte: "+a);
+            }
+        };
+
+        /**
+         * Converts UTF16 characters to UTF8 code points.
+         * @param {!function():number|null} src Characters source as a function returning the next char code respectively
+         *  `null` if there are no more characters left.
+         * @param {!function(number)} dst Code points destination as a function successively called with each converted code
+         *  point.
+         */
+        utfx.UTF16toUTF8 = function(src, dst) {
+            var c1, c2 = null;
+            while (true) {
+                if ((c1 = c2 !== null ? c2 : src()) === null)
+                    break;
+                if (c1 >= 0xD800 && c1 <= 0xDFFF) {
+                    if ((c2 = src()) !== null) {
+                        if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
+                            dst((c1-0xD800)*0x400+c2-0xDC00+0x10000);
+                            c2 = null; continue;
+                        }
+                    }
+                }
+                dst(c1);
+            }
+            if (c2 !== null) dst(c2);
+        };
+
+        /**
+         * Converts UTF8 code points to UTF16 characters.
+         * @param {(!function():number|null) | number} src Code points source, either as a function returning the next code point
+         *  respectively `null` if there are no more code points left or a single numeric code point.
+         * @param {!function(number)} dst Characters destination as a function successively called with each converted char code.
+         * @throws {RangeError} If a code point is out of range
+         */
+        utfx.UTF8toUTF16 = function(src, dst) {
+            var cp = null;
+            if (typeof src === 'number')
+                cp = src, src = function() { return null; };
+            while (cp !== null || (cp = src()) !== null) {
+                if (cp <= 0xFFFF)
+                    dst(cp);
+                else
+                    cp -= 0x10000,
+                    dst((cp>>10)+0xD800),
+                    dst((cp%0x400)+0xDC00);
+                cp = null;
+            }
+        };
+
+        /**
+         * Converts and encodes UTF16 characters to UTF8 bytes.
+         * @param {!function():number|null} src Characters source as a function returning the next char code respectively `null`
+         *  if there are no more characters left.
+         * @param {!function(number)} dst Bytes destination as a function successively called with the next byte.
+         */
+        utfx.encodeUTF16toUTF8 = function(src, dst) {
+            utfx.UTF16toUTF8(src, function(cp) {
+                utfx.encodeUTF8(cp, dst);
+            });
+        };
+
+        /**
+         * Decodes and converts UTF8 bytes to UTF16 characters.
+         * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if there
+         *  are no more bytes left.
+         * @param {!function(number)} dst Characters destination as a function successively called with each converted char code.
+         * @throws {RangeError} If a starting byte is invalid in UTF8
+         * @throws {Error} If the last sequence is truncated. Has an array property `bytes` holding the remaining bytes.
+         */
+        utfx.decodeUTF8toUTF16 = function(src, dst) {
+            utfx.decodeUTF8(src, function(cp) {
+                utfx.UTF8toUTF16(cp, dst);
+            });
+        };
+
+        /**
+         * Calculates the byte length of an UTF8 code point.
+         * @param {number} cp UTF8 code point
+         * @returns {number} Byte length
+         */
+        utfx.calculateCodePoint = function(cp) {
+            return (cp < 0x80) ? 1 : (cp < 0x800) ? 2 : (cp < 0x10000) ? 3 : 4;
+        };
+
+        /**
+         * Calculates the number of UTF8 bytes required to store UTF8 code points.
+         * @param {(!function():number|null)} src Code points source as a function returning the next code point respectively
+         *  `null` if there are no more code points left.
+         * @returns {number} The number of UTF8 bytes required
+         */
+        utfx.calculateUTF8 = function(src) {
+            var cp, l=0;
+            while ((cp = src()) !== null)
+                l += utfx.calculateCodePoint(cp);
+            return l;
+        };
+
+        /**
+         * Calculates the number of UTF8 code points respectively UTF8 bytes required to store UTF16 char codes.
+         * @param {(!function():number|null)} src Characters source as a function returning the next char code respectively
+         *  `null` if there are no more characters left.
+         * @returns {!Array.<number>} The number of UTF8 code points at index 0 and the number of UTF8 bytes required at index 1.
+         */
+        utfx.calculateUTF16asUTF8 = function(src) {
+            var n=0, l=0;
+            utfx.UTF16toUTF8(src, function(cp) {
+                ++n; l += utfx.calculateCodePoint(cp);
+            });
+            return [n,l];
+        };
+
+        return utfx;
+    }();
+
     /**
-     * @type {Array.<number>}
+     * @type {!Array.<string>}
      * @const
-     * @private
+     * @inner
      **/
-    var BASE64_INDEX = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    var BASE64_CODE = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split('');
+
+    /**
+     * @type {!Array.<number>}
+     * @const
+     * @inner
+     **/
+    var BASE64_INDEX = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1,
-        54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1, -1,
-        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31,
-        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
-    
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0,
+        1, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1,
+        -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20, 21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1, -1, 28, 29, 30,
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, -1, -1, -1, -1, -1];
+
+    /**
+     * @type {!function(...number):string}
+     * @inner
+     */
+    var stringFromCharCode = String.fromCharCode;
+
     /**
      * Encodes a byte array to base64 with up to len bytes of input.
-     * @param {Array.<number>} b Byte array
+     * @param {!Array.<number>} b Byte array
      * @param {number} len Maximum input length
      * @returns {string}
+     * @inner
      */
     function base64_encode(b, len) {
         var off = 0;
         var rs = [];
         var c1;
         var c2;
-        if (len <= 0 || len > b.length) {
-            throw(new Error("Invalid 'len': "+len));
-        }
+        if (len <= 0 || len > b.length)
+            throw Error("Invalid 'len': "+len);
         while (off < len) {
             c1 = b[off++] & 0xff;
             rs.push(BASE64_CODE[(c1 >> 2) & 0x3f]);
@@ -917,137 +1122,61 @@
         }
         return rs.join('');
     }
-    
+
     /**
      * Decodes a base64 encoded string to up to len bytes of output.
      * @param {string} s String to decode
      * @param {number} len Maximum output length
-     * @returns {Array.<number>}
+     * @returns {!Array.<number>}
+     * @inner
      */
     function base64_decode(s, len) {
-        var off = 0;
-        var slen = s.length;
-        var olen = 0;
-        var rs = [];
-        var c1, c2, c3, c4, o, code;
-        if (len <= 0) throw(new Error("Illegal 'len': "+len));
+        var off = 0,
+            slen = s.length,
+            olen = 0,
+            rs = [],
+            c1, c2, c3, c4, o, code;
+        if (len <= 0)
+            throw Error("Illegal 'len': "+len);
         while (off < slen - 1 && olen < len) {
             code = s.charCodeAt(off++);
             c1 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
             code = s.charCodeAt(off++);
             c2 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            if (c1 == -1 || c2 == -1) {
+            if (c1 == -1 || c2 == -1)
                 break;
-            }
             o = (c1 << 2) >>> 0;
             o |= (c2 & 0x30) >> 4;
-            rs.push(String.fromCharCode(o));
-            if (++olen >= len || off >= slen) {
+            rs.push(stringFromCharCode(o));
+            if (++olen >= len || off >= slen)
                 break;
-            }
             code = s.charCodeAt(off++);
             c3 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
-            if (c3 == -1) {
+            if (c3 == -1)
                 break;
-            }
             o = ((c2 & 0x0f) << 4) >>> 0;
             o |= (c3 & 0x3c) >> 2;
-            rs.push(String.fromCharCode(o));
-            if (++olen >= len || off >= slen) {
+            rs.push(stringFromCharCode(o));
+            if (++olen >= len || off >= slen)
                 break;
-            }
             code = s.charCodeAt(off++);
             c4 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
             o = ((c3 & 0x03) << 6) >>> 0;
             o |= c4;
-            rs.push(String.fromCharCode(o));
+            rs.push(stringFromCharCode(o));
             ++olen;
         }
         var res = [];
-        for (off = 0; off<olen; off++) {
+        for (off = 0; off<olen; off++)
             res.push(rs[off].charCodeAt(0));
-        }
         return res;
     }
-    
-    // ref: http://mths.be/codepointat v0.1.0 by @mathias
-    if (!String.prototype.codePointAt) {
-        (function() {
-            'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
-            var codePointAt = function(position) {
-                if (this == null) {
-                    throw TypeError();
-                }
-                var string = String(this);
-                var size = string.length;
-                // `ToInteger`
-                var index = position ? Number(position) : 0;
-                if (index != index) { // better `isNaN`
-                    index = 0;
-                }
-                // Account for out-of-bounds indices:
-                if (index < 0 || index >= size) {
-                    return undefined;
-                }
-                // Get the first code unit
-                var first = string.charCodeAt(index);
-                var second;
-                if ( // check if it’s the start of a surrogate pair
-                    first >= 0xD800 && first <= 0xDBFF && // high surrogate
-                        size > index + 1 // there is a next code unit
-                    ) {
-                    second = string.charCodeAt(index + 1);
-                    if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-                        // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-                        return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
-                    }
-                }
-                return first;
-            };
-            if (Object.defineProperty) {
-                Object.defineProperty(String.prototype, 'codePointAt', {
-                    'value': codePointAt,
-                    'configurable': true,
-                    'writable': true
-                });
-            } else {
-                String.prototype["codePointAt"] = codePointAt;
-            }
-        }());
-    }
-        
-    /**
-     * Encodes a unicode code point to bytes.
-     * @param {number} codePoint Code point to encode
-     * @param {Array.<number>} out Output array
-     */
-    function utf8_encode_char(codePoint, out) {
-        if (codePoint < 0)
-            throw RangeError("Illegal code point: "+codePoint);
-        if (codePoint < 0x80) {
-            out.push(  codePoint     &0x7F);
-        } else if (codePoint < 0x800) {
-            out.push(((codePoint>>6 )&0x1F)|0xC0);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else if (codePoint < 0x10000) {
-            out.push(((codePoint>>12)&0x0F)|0xE0);
-            out.push(((codePoint>>6 )&0x3F)|0x80);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else if (codePoint < 0x110000) {
-            out.push(((codePoint>>18)&0x07)|0xF0);
-            out.push(((codePoint>>12)&0x3F)|0x80);
-            out.push(((codePoint>>6 )&0x3F)|0x80);
-            out.push(( codePoint     &0x3F)|0x80);
-        } else
-            throw RangeError("Illegal code point: "+codePoint);
-    }
-    
+
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;
     /* AMD */ else if (typeof define !== 'undefined' && define["amd"])
         define("bcrypt", function() { return bcrypt; });
     /* Global */ else
         (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = bcrypt;
-    
-})(this);
 
+})(this);
