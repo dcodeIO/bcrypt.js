@@ -1,4 +1,7 @@
+// A base64 implementation for the bcrypt algorithm. This is partly non-standard.
+
 /**
+ * bcrypt's own non-standard base64 dictionary.
  * @type {!Array.<string>}
  * @const
  * @inner
@@ -33,12 +36,11 @@ var stringFromCharCode = String.fromCharCode;
  * @inner
  */
 function base64_encode(b, len) {
-    var off = 0;
-    var rs = [];
-    var c1;
-    var c2;
+    var off = 0,
+        rs = [],
+        c1, c2;
     if (len <= 0 || len > b.length)
-        throw Error("Invalid 'len': "+len);
+        throw Error("Illegal len: "+len);
     while (off < len) {
         c1 = b[off++] & 0xff;
         rs.push(BASE64_CODE[(c1 >> 2) & 0x3f]);
@@ -77,7 +79,7 @@ function base64_decode(s, len) {
         rs = [],
         c1, c2, c3, c4, o, code;
     if (len <= 0)
-        throw Error("Illegal 'len': "+len);
+        throw Error("Illegal len: "+len);
     while (off < slen - 1 && olen < len) {
         code = s.charCodeAt(off++);
         c1 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
