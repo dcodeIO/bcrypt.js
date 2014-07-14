@@ -528,18 +528,13 @@
 
     /**
      * Continues with the callback on the next tick.
+     * @function
      * @param {function(...[*])} callback Callback to execute
      * @inner
      */
-    function nextTick(callback) {
-        if (typeof process !== 'undefined' && typeof process.nextTick === 'function') {
-            if (typeof setImmediate === 'function')
-                setImmediate(callback);
-            else
-                process.nextTick(callback);
-        } else
-            setTimeout(callback, 0);
-    }
+    var nextTick = typeof process !== 'undefined' && process && typeof process.nextTick === 'function'
+        ? (typeof setImmediate === 'function' ? setImmediate : process.nextTick)
+        : setTimeout;
 
     /**
      * Converts a JavaScript string to UTF8 bytes.
