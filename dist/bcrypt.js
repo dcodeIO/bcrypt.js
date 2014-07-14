@@ -41,10 +41,52 @@
     var bcrypt = {};
 
     /**
+     * Generates cryptographically secure random bytes.
+     * @function
+     * @param {number} len Bytes length
+     * @returns {!Array.<number>} Random bytes
+     * @throws {Error} If no random implementation is available
+     * @inner
+     */
+    function random(len) {
+        /* node */ if (typeof module !== 'undefined' && module && module['exports'])
+            try {
+                return require("crypto")['randomBytes'](len);
+            } catch (e) {}
+        /* wca */ try {
+            var a; global['crypto']['getRandomValues'](a = new Uint32Array(len));
+            return Array.prototype.slice.call(a);
+        } catch (e) {}
+        /* fallback */ if (!randomFallback)
+            throw Error("No random fallback set, use bcrypt.setRandomFallback to set one.");
+        return randomFallback(len);
+    }
+
+    /**
+     * The random implementation to use as a fallback.
+     * @type {?function(number):!Array.<number>}
+     * @inner
+     */
+    var randomFallback = null;
+
+    /**
+     * Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
+     *  is available.
+     * @param {!function(number):!Array.<number>} random Function taking the number of bytes to generate as its
+     *  sole argument, returning the corresponding array of cryptographically secure random byte values.
+     * @see http://nodejs.org/api/crypto.html
+     * @see http://www.w3.org/TR/WebCryptoAPI/
+     */
+    bcrypt.setRandomFallback = function(random) {
+        randomFallback = random;
+    };
+
+    /**
      * Synchronously generates a salt.
      * @param {number=} rounds Number of rounds to use, defaults to 10 if omitted
      * @param {number=} seed_length Not supported.
      * @returns {string} Resulting salt
+     * @throws {Error} If a random fallback is required but not set
      * @expose
      */
     bcrypt.genSaltSync = function(rounds, seed_length) {
@@ -52,14 +94,23 @@
             rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
         else if (typeof rounds !== 'number')
             throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
-        return _gensalt(rounds);
+        if (rounds < 4 || rounds > 31)
+            throw Error("Illegal number of rounds: "+rounds);
+        var salt = [];
+        salt.push("$2a$");
+        if (rounds < 10)
+            salt.push("0");
+        salt.push(rounds.toString());
+        salt.push('$');
+        salt.push(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+        return salt.join('');
     };
 
     /**
      * Asynchronously generates a salt.
      * @param {(number|function(Error, string=))=} rounds Number of rounds to use, defaults to 10 if omitted
      * @param {(number|function(Error, string=))=} seed_length Not supported.
-     * @param {function(Error, ?string)=} callback Callback receiving the error, if any, and the resulting salt
+     * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
      * @expose
      */
     bcrypt.genSalt = function(rounds, seed_length, callback) {
@@ -198,20 +249,32 @@
     };
 
     /**
-     * crypto.getRandomValues polyfill to use
-     * @type {?function(!Uint32Array)}
+     * Continues with the callback on the next tick.
+     * @function
+     * @param {function(...[*])} callback Callback to execute
      * @inner
      */
-    var _getRandomValues = null;
+    var nextTick = typeof process !== 'undefined' && process && typeof process.nextTick === 'function'
+        ? (typeof setImmediate === 'function' ? setImmediate : process.nextTick)
+        : setTimeout;
 
     /**
-     * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
-     * @param {function(!Uint32Array)} getRandomValues The actual implementation
-     * @expose
+     * Converts a JavaScript string to UTF8 bytes.
+     * @param {string} str String
+     * @returns {!Array.<number>} UTF8 bytes
+     * @inner
      */
-    bcrypt.setRandomPolyfill = function(getRandomValues) {
-        _getRandomValues = getRandomValues;
-    };
+    function stringToBytes(str) {
+        var out = [],
+            i = 0;
+        utfx.encodeUTF16toUTF8(function() {
+            if (i >= str.length) return null;
+            return str.charCodeAt(i++);
+        }, function(b) {
+            out.push(b);
+        });
+        return out;
+    }
 
     // A base64 implementation for the bcrypt algorithm. This is partly non-standard.
 
@@ -527,34 +590,6 @@
     }();
 
     /**
-     * Continues with the callback on the next tick.
-     * @function
-     * @param {function(...[*])} callback Callback to execute
-     * @inner
-     */
-    var nextTick = typeof process !== 'undefined' && process && typeof process.nextTick === 'function'
-        ? (typeof setImmediate === 'function' ? setImmediate : process.nextTick)
-        : setTimeout;
-
-    /**
-     * Converts a JavaScript string to UTF8 bytes.
-     * @param {string} str String
-     * @returns {!Array.<number>} UTF8 bytes
-     * @inner
-     */
-    function stringToBytes(str) {
-        var out = [],
-            i = 0;
-        utfx.encodeUTF16toUTF8(function() {
-            if (i >= str.length) return null;
-            return str.charCodeAt(i++);
-        }, function(b) {
-            out.push(b);
-        });
-        return out;
-    }
-
-    /**
      * @type {number}
      * @const
      * @inner
@@ -834,16 +869,16 @@
         for (var i=0; i<=BLOWFISH_NUM_ROUNDS-2;)
             // Feistel substitution on left word
             n  = S[(l >> 24) & 0xff],
-                n += S[0x100 | ((l >> 16) & 0xff)],
-                n ^= S[0x200 | ((l >> 8) & 0xff)],
-                n += S[0x300 | (l & 0xff)],
-                r ^= n ^ P[++i],
-                // Feistel substitution on right word
-                n  = S[(r >> 24) & 0xff],
-                n += S[0x100 | ((r >> 16) & 0xff)],
-                n ^= S[0x200 | ((r >> 8) & 0xff)],
-                n += S[0x300 | (r & 0xff)],
-                l ^= n ^ P[++i];
+            n += S[0x100 | ((l >> 16) & 0xff)],
+            n ^= S[0x200 | ((l >> 8) & 0xff)],
+            n += S[0x300 | (l & 0xff)],
+            r ^= n ^ P[++i],
+            // Feistel substitution on right word
+            n  = S[(r >> 24) & 0xff],
+            n += S[0x100 | ((r >> 16) & 0xff)],
+            n ^= S[0x200 | ((r >> 8) & 0xff)],
+            n += S[0x300 | (r & 0xff)],
+            l ^= n ^ P[++i];
         lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
         return lr;
@@ -856,8 +891,7 @@
      * @inner
      */
     function _streamtoword(data, offp) {
-        var word = 0;
-        for (var i = 0; i < 4; i++) {
+        for (var i = 0, word = 0; i < 4; i++) {
             word = (word << 8) | (data[offp] & 0xff);
             offp = (offp + 1) % data.length;
         }
@@ -878,16 +912,16 @@
             sw;
         for (var i = 0; i < plen; i++)
             sw = _streamtoword(key, offset),
-                offset = sw.offp,
-                P[i] = P[i] ^ sw.key;
+            offset = sw.offp,
+            P[i] = P[i] ^ sw.key;
         for (i = 0; i < plen; i += 2)
             lr = _encipher(lr, 0, P, S),
-                P[i] = lr[0],
-                P[i + 1] = lr[1];
+            P[i] = lr[0],
+            P[i + 1] = lr[1];
         for (i = 0; i < slen; i += 2)
             lr = _encipher(lr, 0, P, S),
-                S[i] = lr[0],
-                S[i + 1] = lr[1];
+            S[i] = lr[0],
+            S[i + 1] = lr[1];
     }
 
     /**
@@ -906,29 +940,29 @@
             sw;
         for (var i = 0; i < plen; i++)
             sw = _streamtoword(key, offp),
-                offp = sw.offp,
-                P[i] = P[i] ^ sw.key;
+            offp = sw.offp,
+            P[i] = P[i] ^ sw.key;
         offp = 0;
         for (i = 0; i < plen; i += 2)
             sw = _streamtoword(data, offp),
-                offp = sw.offp,
-                lr[0] ^= sw.key,
-                sw = _streamtoword(data, offp),
-                offp = sw.offp,
-                lr[1] ^= sw.key,
-                lr = _encipher(lr, 0, P, S),
-                P[i] = lr[0],
-                P[i + 1] = lr[1];
+            offp = sw.offp,
+            lr[0] ^= sw.key,
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[1] ^= sw.key,
+            lr = _encipher(lr, 0, P, S),
+            P[i] = lr[0],
+            P[i + 1] = lr[1];
         for (i = 0; i < slen; i += 2)
             sw = _streamtoword(data, offp),
-                offp = sw.offp,
-                lr[0] ^= sw.key,
-                sw = _streamtoword(data, offp),
-                offp = sw.offp,
-                lr[1] ^= sw.key,
-                lr = _encipher(lr, 0, P, S),
-                S[i] = lr[0],
-                S[i + 1] = lr[1];
+            offp = sw.offp,
+            lr[0] ^= sw.key,
+            sw = _streamtoword(data, offp),
+            offp = sw.offp,
+            lr[1] ^= sw.key,
+            lr = _encipher(lr, 0, P, S),
+            S[i] = lr[0],
+            S[i + 1] = lr[1];
     }
 
     /**
@@ -994,9 +1028,9 @@
                 var ret = [];
                 for (i = 0; i < clen; i++)
                     ret.push(((cdata[i] >> 24) & 0xff) >>> 0),
-                        ret.push(((cdata[i] >> 16) & 0xff) >>> 0),
-                        ret.push(((cdata[i] >> 8) & 0xff) >>> 0),
-                        ret.push((cdata[i] & 0xff) >>> 0);
+                    ret.push(((cdata[i] >> 16) & 0xff) >>> 0),
+                    ret.push(((cdata[i] >> 8) & 0xff) >>> 0),
+                    ret.push((cdata[i] & 0xff) >>> 0);
                 if (callback) {
                     callback(null, ret);
                     return;
@@ -1121,51 +1155,6 @@
                     callback(null, finish(bytes));
             }, progressCallback);
         }
-    }
-
-    /**
-     * Generates cryptographically secure random bytes.
-     * @param {number} len Number of bytes to generate
-     * @returns {Array.<number>}
-     * @inner
-     */
-    function _randomBytes(len) {
-        // node.js, see: http://nodejs.org/api/crypto.html
-        if (typeof module !== 'undefined' && module.exports)
-            return require("crypto")['randomBytes'](len);
-
-        // Browser, see: http://www.w3.org/TR/WebCryptoAPI/
-        else {
-            var array = new Uint32Array(len);
-            if (global.crypto && typeof global.crypto.getRandomValues === 'function')
-                global.crypto.getRandomValues(array);
-            else if (typeof _getRandomValues === 'function')
-                _getRandomValues(array);
-            else
-                throw Error("Failed to generate random values: Web Crypto API not available / polyfill not set through bcrypt.setRandomPolyfill");
-            return Array.prototype.slice.call(array);
-        }
-    }
-
-    /**
-     * Internally generates a salt.
-     * @param {number} rounds Number of rounds to use
-     * @returns {string} Salt
-     * @throws {Error} If anything goes wrong
-     * @inner
-     */
-    function _gensalt(rounds) {
-        rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
-        if (rounds < 4 || rounds > 31)
-            throw Error("Illegal number of rounds: "+rounds);
-        var salt = [];
-        salt.push("$2a$");
-        if (rounds < 10)
-            salt.push("0");
-        salt.push(rounds.toString());
-        salt.push('$');
-        salt.push(base64_encode(_randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
-        return salt.join('');
     }
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])

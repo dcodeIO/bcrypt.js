@@ -41,10 +41,52 @@
     var bcrypt = {};
 
     /**
+     * Generates cryptographically secure random bytes.
+     * @function
+     * @param {number} len Bytes length
+     * @returns {!Array.<number>} Random bytes
+     * @throws {Error} If no random implementation is available
+     * @inner
+     */
+    function random(len) {
+        /* node */ if (typeof module !== 'undefined' && module && module['exports'])
+            try {
+                return require("crypto")['randomBytes'](len);
+            } catch (e) {}
+        /* wca */ try {
+            var a; global['crypto']['getRandomValues'](a = new Uint32Array(len));
+            return Array.prototype.slice.call(a);
+        } catch (e) {}
+        /* fallback */ if (!randomFallback)
+            throw Error("No random fallback set, use bcrypt.setRandomFallback to set one.");
+        return randomFallback(len);
+    }
+
+    /**
+     * The random implementation to use as a fallback.
+     * @type {?function(number):!Array.<number>}
+     * @inner
+     */
+    var randomFallback = null;
+
+    /**
+     * Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
+     *  is available.
+     * @param {!function(number):!Array.<number>} random Function taking the number of bytes to generate as its
+     *  sole argument, returning the corresponding array of cryptographically secure random byte values.
+     * @see http://nodejs.org/api/crypto.html
+     * @see http://www.w3.org/TR/WebCryptoAPI/
+     */
+    bcrypt.setRandomFallback = function(random) {
+        randomFallback = random;
+    };
+
+    /**
      * Synchronously generates a salt.
      * @param {number=} rounds Number of rounds to use, defaults to 10 if omitted
      * @param {number=} seed_length Not supported.
      * @returns {string} Resulting salt
+     * @throws {Error} If a random fallback is required but not set
      * @expose
      */
     bcrypt.genSaltSync = function(rounds, seed_length) {
@@ -52,14 +94,23 @@
             rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
         else if (typeof rounds !== 'number')
             throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
-        return _gensalt(rounds);
+        if (rounds < 4 || rounds > 31)
+            throw Error("Illegal number of rounds: "+rounds);
+        var salt = [];
+        salt.push("$2a$");
+        if (rounds < 10)
+            salt.push("0");
+        salt.push(rounds.toString());
+        salt.push('$');
+        salt.push(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+        return salt.join('');
     };
 
     /**
      * Asynchronously generates a salt.
      * @param {(number|function(Error, string=))=} rounds Number of rounds to use, defaults to 10 if omitted
      * @param {(number|function(Error, string=))=} seed_length Not supported.
-     * @param {function(Error, ?string)=} callback Callback receiving the error, if any, and the resulting salt
+     * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
      * @expose
      */
     bcrypt.genSalt = function(rounds, seed_length, callback) {
@@ -196,28 +247,10 @@
             throw Error("Illegal hash length: "+hash.length+" != 60");
         return hash.substring(0, 29);
     };
-
-    /**
-     * crypto.getRandomValues polyfill to use
-     * @type {?function(!Uint32Array)}
-     * @inner
-     */
-    var _getRandomValues = null;
-
-    /**
-     * Sets the polyfill that should be used if window.crypto.getRandomValues is not available.
-     * @param {function(!Uint32Array)} getRandomValues The actual implementation
-     * @expose
-     */
-    bcrypt.setRandomPolyfill = function(getRandomValues) {
-        _getRandomValues = getRandomValues;
-    };
-
-    //? include("bcrypt/base64.js");
-
+    
     //? include("bcrypt/util.js");
 
-    //? include("bcrypt/main.js");
+    //? include("bcrypt/impl.js");
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;

@@ -112,102 +112,102 @@ bcrypt.hash('bacon', 8, function(err, hash) {
 
 API
 ---
+### setRandomFallback(random)
 
-  - [bcrypt](#bcrypt)
-  - [bcrypt.genSaltSync(rounds=, seed_length=)](#bcryptgensaltsyncrounds-seed_length)
-  - [bcrypt.genSalt(rounds=, seed_length=, callback)](#bcryptgensaltrounds-seed_length-callback)
-  - [bcrypt.hashSync(s, salt=)](#bcrypthashsyncs-salt)
-  - [bcrypt.hash(s, salt, callback, progressCallback=)](#bcrypthashs-salt-callback-progresscallback)
-  - [bcrypt.compareSync(s, hash)](#bcryptcomparesyncs-hash)
-  - [bcrypt.compare(s, hash, callback, progressCallback=)](#bcryptcompares-hash-callback-progresscallback)
-  - [bcrypt.getRounds(hash)](#bcryptgetroundshash)
-  - [bcrypt.getSalt(hash)](#bcryptgetsalthash)
+Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
+is available.
 
-### bcrypt
-bcrypt namespace.
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| random          | *function(number):!Array.&lt;number&gt;* | Function taking the number of bytes to generate as its sole argument, returning the corresponding array of cryptographically secure random byte values. 
+| **@see**        |                 | http://nodejs.org/api/crypto.html 
+| **@see**        |                 | http://www.w3.org/TR/WebCryptoAPI/ 
 
+### genSaltSync(rounds=, seed_length=)
 
-### bcrypt.genSaltSync(rounds=, seed_length=)
 Synchronously generates a salt.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| rounds | number | Number of rounds to use, defaults to 10 if omitted |
-| seed_length | number | Not supported. |
-|   |||
-| **returns** | string | Resulting salt
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| rounds          | *number*        | Number of rounds to use, defaults to 10 if omitted 
+| seed_length     | *number*        | Not supported. 
+| **@returns**    | *string*        | Resulting salt 
+| **@throws**     | *Error*         | If a random fallback is required but not set 
 
-### bcrypt.genSalt(rounds=, seed_length=, callback)
+### genSalt(rounds=, seed_length=, callback)
+
 Asynchronously generates a salt.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| rounds | (number &#166; function(Error, ?string)) | Number of rounds to use, defaults to 10 if omitted |
-| seed_length | (number &#166; function(Error, ?string)) | Not supported. |
-| callback | function(Error, ?string) | Callback receiving the error, if any, and the resulting salt |
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| rounds          | *number &#124; function(Error, string=)* | Number of rounds to use, defaults to 10 if omitted 
+| seed_length     | *number &#124; function(Error, string=)* | Not supported. 
+| callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting salt 
 
-### bcrypt.hashSync(s, salt=)
+### hashSync(s, salt=)
+
 Synchronously generates a hash for the given string.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| s | string | String to hash |
-| salt | (number &#166; string) | Salt length to generate or salt to use, default to 10 |
-|   |||
-| **returns** | ?string | Resulting hash, actually never null
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| s               | *string*        | String to hash 
+| salt            | *number &#124; string* | Salt length to generate or salt to use, default to 10 
+| **@returns**    | *string*        | Resulting hash 
 
-### bcrypt.hash(s, salt, callback, progressCallback=)
+### hash(s, salt, callback, progressCallback)
+
 Asynchronously generates a hash for the given string.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| s | string | String to hash |
-| salt | number &#166; string | Salt length to generate or salt to use |
-| callback | function(Error, ?string) | Callback receiving the error, if any, and the resulting hash |
-| progressCallback | function(number) | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| s               | *string*        | String to hash 
+| salt            | *number &#124; string* | Salt length to generate or salt to use 
+| callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting hash 
+| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms. 
 
-### bcrypt.compareSync(s, hash)
+### compareSync(s, hash)
+
 Synchronously tests a string against a hash.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| s | string | String to compare |
-| hash | string | Hash to test against |
-|   |||
-| **returns** | boolean | true if matching, otherwise false
-| **throws** | Error | If an argument is illegal
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| s               | *string*        | String to compare 
+| hash            | *string*        | Hash to test against 
+| **@returns**    | *boolean*       | true if matching, otherwise false 
+| **@throws**     | *Error*         | If an argument is illegal 
 
-### bcrypt.compare(s, hash, callback, progressCallback=)
+### compare(s, hash, callback, progressCallback)
+
 Asynchronously compares the given data against the given hash.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| s | string | Data to compare |
-| hash | string | Data to be compared to |
-| callback | function(Error, boolean) | Callback receiving the error, if any, otherwise the result |
-| progressCallback | function(number) | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
-|   |||
-| **throws** | Error | If the callback argument is invalid
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| s               | *string*        | Data to compare 
+| hash            | *string*        | Data to be compared to 
+| callback        | *function(Error, boolean)* | Callback receiving the error, if any, otherwise the result 
+| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms. 
+| **@throws**     | *Error*         | If the callback argument is invalid 
 
-### bcrypt.getRounds(hash)
+### getRounds(hash)
+
 Gets the number of rounds used to encrypt the specified hash.
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| hash | string | Hash to extract the used number of rounds from |
-|   |||
-| **returns** | number | Number of rounds used
-| **throws** | Error | If hash is not a string
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| hash            | *string*        | Hash to extract the used number of rounds from 
+| **@returns**    | *number*        | Number of rounds used 
+| **@throws**     | *Error*         | If hash is not a string 
 
-### bcrypt.getSalt(hash)
-Gets the salt portion from a hash.
+### getSalt(hash)
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| hash | string | Hash to extract the salt from |
-|   |||
-| **returns** | string | Extracted salt part portion
-| **throws** | Error | If `hash` is not a string or otherwise invalid
+Gets the salt portion from a hash. Does not validate the hash.
+
+| Parameter       | Type            | Description
+|-----------------|-----------------|---------------
+| hash            | *string*        | Hash to extract the salt from 
+| **@returns**    | *string*        | Extracted salt part 
+| **@throws**     | *Error*         | If `hash` is not a string or otherwise invalid 
+
 
 Command line
 ------------

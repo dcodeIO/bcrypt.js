@@ -1,5 +1,3 @@
-//? include("../../node_modules/utfx/dist/utfx-embeddable.js");
-
 /**
  * Continues with the callback on the next tick.
  * @function
@@ -27,3 +25,7 @@ function stringToBytes(str) {
     });
     return out;
 }
+
+//? include("util/base64.js");
+
+//? include("../../node_modules/utfx/dist/utfx-embeddable.js");
