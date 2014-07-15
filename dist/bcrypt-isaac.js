@@ -1,6 +1,5 @@
 /*
  Copyright (c) 2012 Nevins Bartolomeo <nevins.bartolomeo@gmail.com>
- Copyright (c) 2012 Yves-Marie K. Rinquin
  Copyright (c) 2012 Shane Girish <shaneGirish@gmail.com>
  Copyright (c) 2014 Daniel Wirtz <dcode@dcode.io>
 
@@ -1201,8 +1200,8 @@
 
         /* 32-bit integer safe adder */
         function add(x, y) {
-            var lsb = (x & 0xffff) + (y & 0xffff);
-            var msb = (x >>>   16) + (y >>>   16) + (lsb >>> 16);
+            var lsb = (x & 0xffff) + (y & 0xffff),
+                msb = (x >>>   16) + (y >>>   16) + (lsb >>> 16);
             return (msb << 16) | (lsb & 0xffff);
         }
 
@@ -1219,17 +1218,15 @@
             var a, b, c, d, e, f, g, h, i;
 
             /* seeding the seeds of love */
-            a = b = c = d =
-                e = f = g = h = 0x9e3779b9; /* the golden ratio */
+            a = b = c = d = e = f = g = h = 0x9e3779b9; /* the golden ratio */
 
-            if(s && typeof(s) === 'number') {
+            if (s && typeof(s) === 'number')
                 s = [s];
-            }
 
-            if(s instanceof Array) {
+            if (s instanceof Array) {
                 reset();
-                for(i = 0; i < s.length; i++)
-                    r[i & 0xff] += (typeof(s[i]) === 'number') ? s[i] : 0;
+                for(i = 0; i < s.length; ++i)
+                    r[i & 0xff] += typeof(s[i]) === 'number' ? s[i] : 0;
             }
 
             /* private: seed mixer */
@@ -1248,31 +1245,27 @@
                 seed_mix();
 
             for(i = 0; i < 256; i += 8) {
-                if(s) { /* use all the information in the seed */
-                    a = add(a, r[i + 0]); b = add(b, r[i + 1]);
-                    c = add(c, r[i + 2]); d = add(d, r[i + 3]);
-                    e = add(e, r[i + 4]); f = add(f, r[i + 5]);
-                    g = add(g, r[i + 6]); h = add(h, r[i + 7]);
-                }
+                if (s) /* use all the information in the seed */
+                    a = add(a, r[i + 0]), b = add(b, r[i + 1]),
+                    c = add(c, r[i + 2]), d = add(d, r[i + 3]),
+                    e = add(e, r[i + 4]), f = add(f, r[i + 5]),
+                    g = add(g, r[i + 6]), h = add(h, r[i + 7]);
                 seed_mix();
                 /* fill in m[] with messy stuff */
                 m[i + 0] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
                 m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
             }
-            if(s) {
+            if(s)
                 /* do a second pass to make all of the seed affect all of m[] */
-                for(i = 0; i < 256; i += 8) {
-                    a = add(a, m[i + 0]); b = add(b, m[i + 1]);
-                    c = add(c, m[i + 2]); d = add(d, m[i + 3]);
-                    e = add(e, m[i + 4]); f = add(f, m[i + 5]);
-                    g = add(g, m[i + 6]); h = add(h, m[i + 7]);
-                    seed_mix();
+                for(i = 0; i < 256; i += 8)
+                    a = add(a, m[i + 0]), b = add(b, m[i + 1]),
+                    c = add(c, m[i + 2]), d = add(d, m[i + 3]),
+                    e = add(e, m[i + 4]), f = add(f, m[i + 5]),
+                    g = add(g, m[i + 6]), h = add(h, m[i + 7]),
+                    seed_mix(),
                     /* fill in m[] with messy stuff (again) */
-                    m[i + 0] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
-                    m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
-                }
-            }
-
+                    m[i + 0] = a, m[i + 1] = b, m[i + 2] = c, m[i + 3] = d,
+                    m[i + 4] = e, m[i + 5] = f, m[i + 6] = g, m[i + 7] = h;
             prng(); /* fill in the first set of results */
             gnt = 256;  /* prepare to use the first set of results */;
         }
@@ -1280,14 +1273,10 @@
         /* isaac generator, n = number of run */
         function prng(n){
             var i, x, y;
-
-            n = (n && typeof(n) === 'number')
-                ? Math.abs(Math.floor(n)) : 1;
-
+            n = n && typeof(n) === 'number' ? Math.abs(Math.floor(n)) : 1;
             while(n--) {
                 cnt = add(cnt,   1);
                 brs = add(brs, cnt);
-
                 for(i = 0; i < 256; i++) {
                     switch(i & 3) {
                         case 0: acc ^= acc <<  13; break;

@@ -1,8 +1,6 @@
 //? if (typeof ISAAC === 'undefined') ISAAC = false;
 /*
  Copyright (c) 2012 Nevins Bartolomeo <nevins.bartolomeo@gmail.com>
-//? if (ISAAC)
- Copyright (c) 2012 Yves-Marie K. Rinquin
  Copyright (c) 2012 Shane Girish <shaneGirish@gmail.com>
  Copyright (c) 2014 Daniel Wirtz <dcode@dcode.io>
 

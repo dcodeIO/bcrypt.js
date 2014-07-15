@@ -1,7 +1,8 @@
 var path = require("path"),
     fs = require("fs"),
     binding = require("bcrypt"),
-    bcrypt = require(path.join(__dirname, '..', 'index.js'));
+    bcrypt = require(path.join(__dirname, '..', 'index.js')),
+    isaac = eval(fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "isaac.js"))+" isaac");
     
 module.exports = {
     
@@ -116,5 +117,13 @@ module.exports = {
                 progress.push(n);
             });
         });
+    },
+    
+    "isaac": function(test) {
+        for (var i= 0, n; i<999999; ++i) {
+            n = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
+            test.ok(n >= 0 && n < 256);
+        }
+        test.done();
     }
 };
