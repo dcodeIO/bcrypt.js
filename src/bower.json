@@ -5,7 +5,13 @@
     "main": "dist/bcrypt-isaac.js",
     "license": "New-BSD",
     "homepage": "http://dcode.io/",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/dcodeIO/bcrypt.js.git"
+    },
     "keywords": ["bcrypt", "password", "auth", "authentication", "encryption", "crypt", "crypto"],
+    "dependencies": {},
+    "devDependencies": {},
     "ignore": [
         "**/.*",
         "node_modules",

@@ -1162,7 +1162,7 @@
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;
     /* AMD */ else if (typeof define !== 'undefined' && define["amd"])
-        define("bcrypt", function() { return bcrypt; });
+        define(function() { return bcrypt; });
     /* Global */ else
         (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = bcrypt;
 
