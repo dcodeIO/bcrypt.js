@@ -1,0 +1,16 @@
+{
+    "name": "bcryptjs",
+    "description": "Optimized bcrypt in plain JavaScript with zero dependencies.",
+    "version": /*?== VERSION */,
+    "main": "dist/bcrypt-isaac.js",
+    "license": "New-BSD",
+    "homepage": "http://dcode.io/",
+    "keywords": ["bcrypt", "password", "auth", "authentication", "encryption", "crypt", "crypto"],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
+}

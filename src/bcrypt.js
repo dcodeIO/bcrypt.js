@@ -1,7 +1,10 @@
+//? if (typeof ISAAC === 'undefined') ISAAC = false;
 /*
  Copyright (c) 2012 Nevins Bartolomeo <nevins.bartolomeo@gmail.com>
+//? if (ISAAC)
+ Copyright (c) 2012 Yves-Marie K. Rinquin
  Copyright (c) 2012 Shane Girish <shaneGirish@gmail.com>
- Copyright (c) 2013 Daniel Wirtz <dcode@dcode.io>
+ Copyright (c) 2014 Daniel Wirtz <dcode@dcode.io>
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
@@ -27,6 +30,9 @@
  */
 
 /**
+//? if (ISAAC)
+ * @license bcrypt-isaac.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
+//? else
  * @license bcrypt.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/bcrypt.js for details
@@ -53,7 +59,7 @@
             try {
                 return require("crypto")['randomBytes'](len);
             } catch (e) {}
-        /* wca */ try {
+        /* WCA */ try {
             var a; global['crypto']['getRandomValues'](a = new Uint32Array(len));
             return Array.prototype.slice.call(a);
         } catch (e) {}
@@ -67,12 +73,17 @@
      * @type {?function(number):!Array.<number>}
      * @inner
      */
-    var randomFallback = null;
+    var randomFallback =/*? if (ISAAC) { */ function(len) {
+        for (var a=[], i=0; i<len; ++i)
+            a[i] = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
+        return a;
+    };/*? } else { */ null;/*? }*/
+
 
     /**
      * Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
      *  is available.
-     * @param {!function(number):!Array.<number>} random Function taking the number of bytes to generate as its
+     * @param {?function(number):!Array.<number>} random Function taking the number of bytes to generate as its
      *  sole argument, returning the corresponding array of cryptographically secure random byte values.
      * @see http://nodejs.org/api/crypto.html
      * @see http://www.w3.org/TR/WebCryptoAPI/
@@ -251,6 +262,8 @@
     //? include("bcrypt/util.js");
 
     //? include("bcrypt/impl.js");
+    
+    //? if (ISAAC) include("bcrypt/prng/isaac.js");
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;

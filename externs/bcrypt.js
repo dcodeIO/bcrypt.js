@@ -15,7 +15,7 @@
  */
 
 /**
- * @fileoverview Definitions for bcrypt.js.
+ * @fileoverview Definitions for bcrypt.js 2.
  * @externs
  * @author Daniel Wirtz <dcode@dcode.io>
  */
@@ -26,9 +26,9 @@
 var bcrypt = {};
 
 /**
- * @param {Uint32Array} array
+ * @param {?function(number):!Array.<number>} random
  */
-bcrypt.setRandomPolyfill = function(array) {};
+bcrypt.setRandomFallback = function(random) {};
 
 /**
  * @param {number=} rounds
@@ -40,7 +40,7 @@ bcrypt.genSaltSync = function(rounds, seed_length) {};
 /**
  * @param {(number|function(Error, ?string))=} rounds
  * @param {(number|function(Error, ?string))=} seed_length
- * @param {function(Error, ?string)=} callback
+ * @param {function(Error, string=)=} callback
  */
 bcrypt.genSalt = function(rounds, seed_length, callback) {};
 
@@ -54,7 +54,7 @@ bcrypt.hashSync = function(s, salt) {};
 /**
  * @param {string} s
  * @param {number|string} salt
- * @param {function(Error, ?string)} callback
+ * @param {function(Error, string=)} callback
  * @expose
  */
 bcrypt.hash = function(s, salt, callback) {};

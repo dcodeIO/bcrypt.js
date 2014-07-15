@@ -5,11 +5,12 @@ binding and also working in the browser.
 
 Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=master)
 --------
-* CommonJS/node.js compatible (via [crypto](http://nodejs.org/api/crypto.html)), also available via [npm](https://npmjs.org/package/bcryptjs) 
-* Shim/browser compatible (via [WebCryptoAPI](http://www.w3.org/TR/WebCryptoAPI))
-* RequireJS/AMD compatible
+* CommonJS compatible (via [crypto](http://nodejs.org/api/crypto.html)), also available via [npm](https://npmjs.org/package/bcryptjs) 
+* Browser compatible (via [WebCryptoAPI](http://www.w3.org/TR/WebCryptoAPI))
+* AMD compatible
 * Zero production dependencies
 * Small footprint
+* ISAAC PRNG as default fallback with bcrypt-isaac.js
 * Compiled with Closure Compiler using advanced optimizations, [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
 
 Security considerations
@@ -154,7 +155,7 @@ Synchronously generates a hash for the given string.
 | salt            | *number &#124; string* | Salt length to generate or salt to use, default to 10 
 | **@returns**    | *string*        | Resulting hash 
 
-### hash(s, salt, callback, progressCallback)
+### hash(s, salt, callback, progressCallback=)
 
 Asynchronously generates a hash for the given string.
 
@@ -176,7 +177,7 @@ Synchronously tests a string against a hash.
 | **@returns**    | *boolean*       | true if matching, otherwise false 
 | **@throws**     | *Error*         | If an argument is illegal 
 
-### compare(s, hash, callback, progressCallback)
+### compare(s, hash, callback, progressCallback=)
 
 Asynchronously compares the given data against the given hash.
 

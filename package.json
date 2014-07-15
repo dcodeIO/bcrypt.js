@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to 'bcrypt'.",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "contributors": [
         "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",
@@ -27,6 +27,7 @@
         "crypto"
     ],
     "main": "index.js",
+    "browser": "dist/bcrypt-isaac.js",
     "dependencies": {},
     "devDependencies": {
         "testjs": "~1",
@@ -35,11 +36,17 @@
         "bcrypt": "latest",
         "utfx": "~1"
     },
-    "license": "Apache-2.0",
+    "licenses" : [
+        {
+            "type" : "New-BSD, MIT",
+            "url" : "https://raw.githubusercontent.com/dcodeIO/bcrypt.js/master/LICENSE"
+        }
+    ],
     "scripts": {
         "test": "node node_modules/testjs/bin/testjs",
-        "build": "node node_modules/metascript/bin/metascript ./src/bcrypt.js > ./dist/bcrypt.js",
+        "build": "node scripts/build.js",
         "compile": "ccjs dist/bcrypt.js --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --output_wrapper=\"(function(){%output%})();\" > dist/bcrypt.min.js",
-        "make": "npm run-script build && npm run-script compile && npm test"
+        "compile-isaac": "ccjs dist/bcrypt-isaac.js --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --output_wrapper=\"(function(){%output%})();\" > dist/bcrypt-isaac.min.js",
+        "make": "npm run-script build && npm run-script compile && npm run-script compile-isaac && npm test"
     }
 }
