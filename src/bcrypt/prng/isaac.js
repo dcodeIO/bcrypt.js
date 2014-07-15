@@ -44,7 +44,7 @@ var isaac = (function(){
     /* initialisation */
     function reset() {
         acc = brs = cnt = 0;
-        for(var i = 0; i < 256; ++i)
+        for (var i = 0; i < 256; ++i)
             m[i] = r[i] = 0;
         gnt = 0;
     }
@@ -61,7 +61,7 @@ var isaac = (function(){
 
         if (s instanceof Array) {
             reset();
-            for(i = 0; i < s.length; ++i)
+            for (i = 0; i < s.length; ++i)
                 r[i & 0xff] += typeof(s[i]) === 'number' ? s[i] : 0;
         }
 
@@ -77,10 +77,10 @@ var isaac = (function(){
             h ^= a >>>  9; c = add(c, h); a = add(a, b);
         }
 
-        for(i = 0; i < 4; i++) /* scramble it */
+        for (i = 0; i < 4; i++) /* scramble it */
             seed_mix();
 
-        for(i = 0; i < 256; i += 8) {
+        for (i = 0; i < 256; i += 8) {
             if (s) /* use all the information in the seed */
                 a = add(a, r[i + 0]), b = add(b, r[i + 1]),
                 c = add(c, r[i + 2]), d = add(d, r[i + 3]),
@@ -91,9 +91,9 @@ var isaac = (function(){
             m[i + 0] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
             m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
         }
-        if(s)
+        if (s)
             /* do a second pass to make all of the seed affect all of m[] */
-            for(i = 0; i < 256; i += 8)
+            for (i = 0; i < 256; i += 8)
                 a = add(a, m[i + 0]), b = add(b, m[i + 1]),
                 c = add(c, m[i + 2]), d = add(d, m[i + 3]),
                 e = add(e, m[i + 4]), f = add(f, m[i + 5]),
@@ -107,10 +107,10 @@ var isaac = (function(){
     }
 
     /* isaac generator, n = number of run */
-    function prng(n){
+    function prng(n) {
         var i, x, y;
         n = n && typeof(n) === 'number' ? Math.abs(Math.floor(n)) : 1;
-        while(n--) {
+        while (n--) {
             cnt = add(cnt,   1);
             brs = add(brs, cnt);
             for(i = 0; i < 256; i++) {
@@ -129,7 +129,7 @@ var isaac = (function(){
 
     /* return a random number between */
     return function() {
-        if(!gnt--)
+        if (!gnt--)
             prng(), gnt = 255;
         return r[gnt];
     };

@@ -122,7 +122,7 @@ module.exports = {
     "isaac": function(test) {
         for (var i= 0, n; i<999999; ++i) {
             n = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
-            test.ok(n >= 0 && n < 256);
+            test.ok(n === n && n >= 0 && n < 256 && n % 1 === 0);
         }
         test.done();
     }
