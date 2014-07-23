@@ -71,11 +71,11 @@
      * @type {?function(number):!Array.<number>}
      * @inner
      */
-    var randomFallback =/*? if (ISAAC) { */ function(len) {
+    var randomFallback = /*? if (ISAAC) { */function(len) {
         for (var a=[], i=0; i<len; ++i)
             a[i] = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
         return a;
-    };/*? } else { */ null;/*? }*/
+    };/*? } else { */null;/*? }*/
 
 
     /**

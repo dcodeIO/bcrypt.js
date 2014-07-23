@@ -30,3 +30,4 @@ function stringToBytes(str) {
 
 //? include("../../node_modules/utfx/dist/utfx-embeddable.js");
 
+Date.now = Date.now || function() { return +new Date; }; 

@@ -593,6 +593,7 @@
         return utfx;
     }();
 
+    Date.now = Date.now || function() { return +new Date; };
 
     /**
      * @type {number}
@@ -871,7 +872,7 @@
             r = lr[off + 1];
 
         l ^= P[0];
-        for (var i=0; i<=BLOWFISH_NUM_ROUNDS-2;)
+        for (var i=0, k=BLOWFISH_NUM_ROUNDS-2; i<=k;)
             // Feistel substitution on left word
             n  = S[(l >> 24) & 0xff],
             n += S[0x100 | ((l >> 16) & 0xff)],
@@ -896,10 +897,9 @@
      * @inner
      */
     function _streamtoword(data, offp) {
-        for (var i = 0, word = 0; i < 4; i++) {
-            word = (word << 8) | (data[offp] & 0xff);
+        for (var i = 0, word = 0; i < 4; ++i)
+            word = (word << 8) | (data[offp] & 0xff),
             offp = (offp + 1) % data.length;
-        }
         return { key: word, offp: offp };
     }
 

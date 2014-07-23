@@ -15,7 +15,7 @@ option to specify a random fallback for browser environments that do not support
   has been compiled with Closure Compiler using advanced optimizations.
   
 The standard version, which is slightly smaller, is recommended if you are already using a Web Crypto API polyfill or
-intend to not support anything else.
+intend to not support anything else / intend to use a custom random fallback.
 
 ### Including ISAAC PRNG as default random fallback
 
