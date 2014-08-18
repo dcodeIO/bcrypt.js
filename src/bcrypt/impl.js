@@ -391,7 +391,7 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
 
     // Validate
     if (rounds < 4 || rounds > 31) {
-        err = Error("Illegal number of rounds: "+rounds);
+        err = Error("Illegal number of rounds (4-31): "+rounds);
         if (callback) {
             nextTick(callback.bind(this, err));
             return;

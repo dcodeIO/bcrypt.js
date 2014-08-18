@@ -95,7 +95,7 @@
         else if (typeof rounds !== 'number')
             throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
         if (rounds < 4 || rounds > 31)
-            throw Error("Illegal number of rounds: "+rounds);
+            throw Error("Illegal number of rounds (4-31): "+rounds);
         var salt = [];
         salt.push("$2a$");
         if (rounds < 10)
@@ -984,7 +984,7 @@
 
         // Validate
         if (rounds < 4 || rounds > 31) {
-            err = Error("Illegal number of rounds: "+rounds);
+            err = Error("Illegal number of rounds (4-31): "+rounds);
             if (callback) {
                 nextTick(callback.bind(this, err));
                 return;

@@ -37,7 +37,7 @@
  */
 (function(global) {
     "use strict";
-    
+
     /**
      * bcrypt namespace.
      * @type {Object.<string,*>}
@@ -104,7 +104,7 @@
         else if (typeof rounds !== 'number')
             throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
         if (rounds < 4 || rounds > 31)
-            throw Error("Illegal number of rounds: "+rounds);
+            throw Error("Illegal number of rounds (4-31): "+rounds);
         var salt = [];
         salt.push("$2a$");
         if (rounds < 10)
@@ -256,11 +256,11 @@
             throw Error("Illegal hash length: "+hash.length+" != 60");
         return hash.substring(0, 29);
     };
-    
+
     //? include("bcrypt/util.js");
 
     //? include("bcrypt/impl.js");
-    
+
     //? if (ISAAC) include("bcrypt/prng/isaac.js");
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
@@ -269,5 +269,5 @@
         define(function() { return bcrypt; });
     /* Global */ else
         (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = bcrypt;
-    
+
 })(this);
