@@ -1,17 +1,10 @@
-![bcrypt.js - bcrypt in plain JavaScript](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
+![bcrypt.js - Optimized bcrypt in JavaScript with zero dependencies](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
 ===========
-Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt)
-binding and also working in the browser.
+Optimized bcrypt in JavaScript with zero dependencies. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt)
+binding on node.js and also working in the browser.
 
-Features ![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.png?branch=master)
---------
-* CommonJS compatible (via [crypto](http://nodejs.org/api/crypto.html)), also available via [npm](https://npmjs.org/package/bcryptjs) 
-* Browser compatible (via [WebCryptoAPI](http://www.w3.org/TR/WebCryptoAPI))
-* AMD compatible
-* Zero production dependencies
-* Small footprint
-* ISAAC PRNG as default fallback with bcrypt-isaac.js
-* Compiled with Closure Compiler using advanced optimizations, [externs included](https://github.com/dcodeIO/bcrypt.js/blob/master/externs/bcrypt.js)
+[![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.svg?branch=master)](https://travis-ci.org/dcodeIO/bcrypt.js)
+[![Donate](https://raw.githubusercontent.com/dcodeIO/bcrypt.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20bcrypt.js)
 
 Security considerations
 -----------------------
@@ -19,39 +12,48 @@ Besides incorporating a salt to protect against rainbow table attacks, bcrypt is
 iteration count can be increased to make it slower, so it remains resistant to brute-force search attacks even with
 increasing computation power. ([see](http://en.wikipedia.org/wiki/Bcrypt))
 
-While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower, effectively
-reducing the number of iterations that can be processed in an equal time span.
+While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower ([about 2.7
+times](https://github.com/dcodeIO/bcrypt.js/wiki/Benchmark)), effectively reducing the number of iterations that can be
+processed in an equal time span.
 
 Usage
 -----
+The library is compatible with CommonJS and AMD loaders and is exposed globally as `dcodeIO.bcrypt` if neither is
+available.
 
-#### node.js
+### node.js
+
+On node.js, the inbuilt [crypto module](http://nodejs.org/api/crypto.html)'s randomBytes interface is used to obtain
+secure random numbers.
+
 `npm install bcryptjs`
 
-```javascript
+```js
 var bcrypt = require('bcryptjs');
 ...
 ```
 
-#### RequireJS/AMD
-```javascript
+### Browser
+
+In the browser, bcrypt.js by default relies on [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI)'s getRandomValues
+interface to obtain secure random numbers. bcrypt-isaac.js additionally ships with the ISAACs PRNG used as the default
+fallback if the former is not available. See [bcrypt.setRandomFallback](https://github.com/dcodeIO/bcrypt.js#setrandomfallbackrandom)
+to set a custom fallback.
+
+```js
+var bcrypt = dcodeIO.bcrypt;
+...
+```
+
+or
+
+```js
 require.config({
-    "paths": {
-        "bcrypt": "/path/to/bcrypt.js"
-    }
+    paths: { "bcrypt": "/path/to/bcrypt.js" }
 });
 require(["bcrypt"], function(bcrypt) {
     ...
 });
-```
-
-#### Shim/browser
-```html
-<script src="//raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.min.js"></script>
-```
-```javascript
-var bcrypt = dcodeIO.bcrypt;
-...
 ```
 
 Usage - Sync
@@ -229,4 +231,4 @@ which is itself based on [javascript-bcrypt](http://code.google.com/p/javascript
 
 License
 -------
-Apache License, Version 2.0 if not stated otherwise
+New-BSD / MIT ([see](https://github.com/dcodeIO/bcrypt.js/blob/master/LICENSE))

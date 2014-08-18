@@ -1018,7 +1018,7 @@
             if (progressCallback)
                 progressCallback(i/rounds);
             if (i < rounds) {
-                var start = new Date();
+                var start = Date.now();
                 for (; i < rounds;) {
                     i = i + 1;
                     _key(b, P, S);
