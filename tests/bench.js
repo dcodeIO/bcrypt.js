@@ -20,6 +20,23 @@ function testAsync(name, salt, impl, cb) {
     });
 }
 
+function testMax(name, impl) {
+    var s = "",
+        salt = bcryptjs.genSaltSync(4),
+        last = null;
+    while (s.length < 100) {
+        s += "0";
+        var hash = impl.hashSync(s, salt);
+        if (hash === last) {
+            console.log(name+" maximum input length is: "+(s.length-1));
+            break;
+        }
+        last = hash;
+    }
+}
+
+testMax("bcrypt.js", bcryptjs);
+
 console.log("## Comparing bcryptjs with bcrypt\n");
 
 function next() {

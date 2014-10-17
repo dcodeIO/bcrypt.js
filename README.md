@@ -16,6 +16,9 @@ While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure J
 times](https://github.com/dcodeIO/bcrypt.js/wiki/Benchmark)), effectively reducing the number of iterations that can be
 processed in an equal time span.
 
+The maximum input length is 72 bytes (note that UTF8 encoded characters use up to 4 bytes) and the length of generated
+hashes is 60 characters.
+
 Usage
 -----
 The library is compatible with CommonJS and AMD loaders and is exposed globally as `dcodeIO.bcrypt` if neither is
@@ -117,8 +120,8 @@ API
 ---
 ### setRandomFallback(random)
 
-Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
-is available.
+Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
+API is available. Please note: It is highly important that this PRNG is cryptographically secure!
 
 | Parameter       | Type            | Description
 |-----------------|-----------------|---------------
