@@ -20,13 +20,12 @@ intend to not support anything else / intend to use a custom random fallback.
 ### Including ISAAC PRNG as default random fallback
 
 The Web Crypto API is fairly new and not supported by all / older browsers. For maximum compatibility this version
-includes [isaac.js](https://github.com/rubycon/isaac.js), a JavaScript implementation of the ISAAC PRNG, which is used
-as the default random fallback if neither node's crypto module nor the Web Crypto API is available.
+includes [isaac.js](https://github.com/rubycon/isaac.js), a JavaScript implementation of the ISAAC CSPRNG, in conjunction
+with an [entropy accumulator](https://github.com/dcodeIO/bcrypt.js/blob/master/src/bcrypt/prng/accum.js) for initial
+seeding, which are then used as the default random fallback if neither node's crypto module nor the Web Crypto API is
+available.
 
-**Please note:** Seeding is performed using an [entropy accumulator](https://github.com/dcodeIO/bcrypt.js/blob/master/src/bcrypt/prng/accum.js)
-using multiple sources of randomness like mouse and touch movement, page load time, general timings and mixing in
-Math.random occasionally. Please consider taking a look at the accumulator to understand how it works for optimal
-results.
+**See also:** [fallback random number generators considered insecure](https://github.com/dcodeIO/bcrypt.js/issues/16)
 
 * **[bcrypt-isaac.js](https://github.com/dcodeIO/bcrypt.js/blob/master/dist/bcrypt-isaac.js)**
   contains the commented source code.
