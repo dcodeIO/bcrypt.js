@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies.",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "main": "dist/bcrypt-isaac.js",
     "license": "New-BSD",
     "homepage": "http://dcode.io/",

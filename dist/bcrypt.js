@@ -81,7 +81,8 @@
 
     /**
      * Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
-     *  API is available. Please note: It is highly important that this PRNG is cryptographically secure!
+     *  API is available. Please note: It is highly important that the PRNG used is cryptographically secure and that it
+     *  is seeded properly!
      * @param {?function(number):!Array.<number>} random Function taking the number of bytes to generate as its
      *  sole argument, returning the corresponding array of cryptographically secure random byte values.
      * @see http://nodejs.org/api/crypto.html
