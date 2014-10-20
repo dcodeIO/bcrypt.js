@@ -30,9 +30,9 @@ var isaac = (function(){
         brs = 0,        // last result
         cnt = 0,        // counter
         r = Array(256), // result array
-        gnt = 0;        // generation counter
+        gnt = 0,        // generation counter
+        isd = false;    // initially seeded
 
-    seed(Math.random() * 0xffffffff);
 
     /* 32-bit integer safe adder */
     function add(x, y) {
@@ -129,6 +129,10 @@ var isaac = (function(){
 
     /* return a random number between */
     return function() {
+        if (!isd) // seed from accumulator
+            isd = true,
+            accum.stop(),
+            seed(accum.fetch());
         if (!gnt--)
             prng(), gnt = 255;
         return r[gnt];

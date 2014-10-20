@@ -2,7 +2,12 @@ var path = require("path"),
     fs = require("fs"),
     binding = require("bcrypt"),
     bcrypt = require(path.join(__dirname, '..', 'index.js')),
-    isaac = eval(fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "isaac.js"))+" isaac");
+    isaac = eval(
+        fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "accum.js"))+
+        fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "isaac.js"))+
+        " accum.start();"+
+        " isaac"
+    );
     
 module.exports = {
     

@@ -45,6 +45,13 @@
     var bcrypt = {};
 
     /**
+     * The random implementation to use as a fallback.
+     * @type {?function(number):!Array.<number>}
+     * @inner
+     */
+    var randomFallback = null;
+
+    /**
      * Generates cryptographically secure random bytes.
      * @function
      * @param {number} len Bytes length
@@ -66,12 +73,15 @@
         return randomFallback(len);
     }
 
-    /**
-     * The random implementation to use as a fallback.
-     * @type {?function(number):!Array.<number>}
-     * @inner
-     */
-    var randomFallback = /*? if (ISAAC) { */function(len) {
+    // Test if any secure randomness source is available
+    var randomAvailable = false;
+    try {
+        random(1);
+        randomAvailable = true;
+    } catch (e) {}
+
+    // Default fallback, if any
+    randomFallback = /*? if (ISAAC) { */function(len) {
         for (var a=[], i=0; i<len; ++i)
             a[i] = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
         return a;
@@ -261,7 +271,15 @@
 
     //? include("bcrypt/impl.js");
 
-    //? if (ISAAC) include("bcrypt/prng/isaac.js");
+    //? if (ISAAC) {
+    //? include("bcrypt/prng/accum.js");
+
+    // Start accumulating
+    if (!randomAvailable)
+        accum.start();
+
+    //? include("bcrypt/prng/isaac.js");
+    //? }
 
     /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = bcrypt;

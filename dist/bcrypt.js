@@ -41,6 +41,13 @@
     var bcrypt = {};
 
     /**
+     * The random implementation to use as a fallback.
+     * @type {?function(number):!Array.<number>}
+     * @inner
+     */
+    var randomFallback = null;
+
+    /**
      * Generates cryptographically secure random bytes.
      * @function
      * @param {number} len Bytes length
@@ -62,16 +69,19 @@
         return randomFallback(len);
     }
 
-    /**
-     * The random implementation to use as a fallback.
-     * @type {?function(number):!Array.<number>}
-     * @inner
-     */
-    var randomFallback = null;
+    // Test if any secure randomness source is available
+    var randomAvailable = false;
+    try {
+        random(1);
+        randomAvailable = true;
+    } catch (e) {}
+
+    // Default fallback, if any
+    randomFallback = null;
 
     /**
-     * Sets the random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto API
-     *  is available.
+     * Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
+     *  API is available. Please note: It is highly important that this PRNG is cryptographically secure!
      * @param {?function(number):!Array.<number>} random Function taking the number of bytes to generate as its
      *  sole argument, returning the corresponding array of cryptographically secure random byte values.
      * @see http://nodejs.org/api/crypto.html
