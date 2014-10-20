@@ -65,11 +65,11 @@
                 return require("crypto")['randomBytes'](len);
             } catch (e) {}
         /* WCA */ try {
-            var a; global['crypto']['getRandomValues'](a = new Uint32Array(len));
+            var a; (global['crypto']||global['msCrypto'])['getRandomValues'](a = new Uint32Array(len));
             return Array.prototype.slice.call(a);
         } catch (e) {}
         /* fallback */ if (!randomFallback)
-            throw Error("No random fallback set, use bcrypt.setRandomFallback to set one.");
+            throw Error("Neither WebCryptoAPI nor a crypto module is available. Use bcrypt.setRandomFallback to set an alternative");
         return randomFallback(len);
     }
 

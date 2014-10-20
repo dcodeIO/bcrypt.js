@@ -1,13 +1,13 @@
 var path = require("path"),
     fs = require("fs"),
     binding = require("bcrypt"),
-    bcrypt = require(path.join(__dirname, '..', 'index.js')),
+    bcrypt = require(path.join(__dirname, '..', 'index.js'))/*,
     isaac = eval(
         fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "accum.js"))+
         fs.readFileSync(path.join(__dirname, "..", "src", "bcrypt", "prng", "isaac.js"))+
         " accum.start();"+
         " isaac"
-    );
+    )*/;
     
 module.exports = {
     
@@ -122,7 +122,7 @@ module.exports = {
                 progress.push(n);
             });
         });
-    },
+    }/*,
     
     "isaac": function(test) {
         for (var i= 0, n; i<999999; ++i) {
@@ -130,5 +130,5 @@ module.exports = {
             test.ok(n === n && n >= 0 && n < 256 && n % 1 === 0);
         }
         test.done();
-    }
+    }*/
 };

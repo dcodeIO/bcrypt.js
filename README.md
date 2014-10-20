@@ -38,10 +38,9 @@ var bcrypt = require('bcryptjs');
 
 ### Browser
 
-In the browser, bcrypt.js by default relies on [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI)'s getRandomValues
-interface to obtain secure random numbers. bcrypt-isaac.js additionally ships with the ISAACs PRNG used as the default
-fallback if the former is not available. See [bcrypt.setRandomFallback](https://github.com/dcodeIO/bcrypt.js#setrandomfallbackrandom)
-to set a custom fallback.
+In the browser, bcrypt.js relies on [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI)'s getRandomValues
+interface to obtain secure random numbers. If no cryptographically secure source of randomness is available, you may
+specify one through [bcrypt.setRandomFallback](https://github.com/dcodeIO/bcrypt.js#setrandomfallbackrandom).
 
 ```js
 var bcrypt = dcodeIO.bcrypt;
@@ -121,7 +120,8 @@ API
 ### setRandomFallback(random)
 
 Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
-API is available. Please note: It is highly important that this PRNG is cryptographically secure!
+API is available. Please note: It is highly important that the PRNG used is cryptographically secure and that it is
+seeded properly!
 
 | Parameter       | Type            | Description
 |-----------------|-----------------|---------------

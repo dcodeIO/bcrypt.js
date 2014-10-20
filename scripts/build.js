@@ -20,13 +20,13 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "bcrypt.js")), filename, scope, srcDir)
 );
 
-// Make isaac build
-scope.ISAAC = true;
+// Make isaac build - see: https://github.com/dcodeIO/bcrypt.js/issues/16
+/* scope.ISAAC = true;
 console.log("Building bcrypt-isaac.js with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "bcrypt-isaac.js"),
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "bcrypt.js")), filename, scope, srcDir)
-);
+); */
 
 // Update bower.json
 scope = { VERSION: pkg.version };
