@@ -127,7 +127,10 @@ seeded properly!
 |-----------------|-----------------|---------------
 | random          | *function(number):!Array.&lt;number&gt;* | Function taking the number of bytes to generate as its sole argument, returning the corresponding array of cryptographically secure random byte values. 
 | **@see**        |                 | http://nodejs.org/api/crypto.html 
-| **@see**        |                 | http://www.w3.org/TR/WebCryptoAPI/ 
+| **@see**        |                 | http://www.w3.org/TR/WebCryptoAPI/
+
+**Hint:** You might use [isaac.js](https://github.com/rubycon/isaac.js) as a CSPRNG but you still have to make sure to
+seed it properly.
 
 ### genSaltSync(rounds=, seed_length=)
 
