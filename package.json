@@ -45,7 +45,8 @@
     "scripts": {
         "test": "node node_modules/testjs/bin/testjs",
         "build": "node scripts/build.js",
-        "compile": "ccjs dist/bcrypt.js --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --output_wrapper=\"(function(){%output%})();\" > dist/bcrypt.min.js",
+        "compile": "node node_modules/closurecompiler/bin/ccjs dist/bcrypt.js --compilation_level=ADVANCED_OPTIMIZATIONS --create_source_map=dist/bcrypt.min.map --externs=externs/minimal-env.js --output_wrapper=\"(function(){%output%})();\" > dist/bcrypt.min.js",
+        "compress": "gzip -c -9 dist/bcrypt.min.js > dist/bcrypt.min.js.gz",
         "make": "npm run-script build && npm run-script compile && npm test"
     }
 }
