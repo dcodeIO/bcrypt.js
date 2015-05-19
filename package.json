@@ -36,12 +36,7 @@
         "bcrypt": "latest",
         "utfx": "~1"
     },
-    "licenses" : [
-        {
-            "type" : "New-BSD, MIT",
-            "url" : "https://raw.githubusercontent.com/dcodeIO/bcrypt.js/master/LICENSE"
-        }
-    ],
+    "license" : "MIT",
     "scripts": {
         "test": "node node_modules/testjs/bin/testjs",
         "build": "node scripts/build.js",
