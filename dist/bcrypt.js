@@ -31,7 +31,16 @@
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/bcrypt.js for details
  */
-(function(global) {
+(function(global, factory) {
+
+    /* AMD */ if (typeof define === 'function' && define["amd"])
+        define([], factory);
+    /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+        module["exports"] = factory();
+    /* Global */ else
+        (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = factory();
+
+}(this, function() {
     "use strict";
 
     /**
@@ -1169,12 +1178,25 @@
         }
     }
 
+    /**
+     * Encodes a byte array to base64 with up to len bytes of input, using the custom bcrypt alphabet.
+     * @function
+     * @param {!Array.<number>} b Byte array
+     * @param {number} len Maximum input length
+     * @returns {string}
+     * @expose
+     */
+    bcrypt.encodeBase64 = base64_encode;
 
-    /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
-        module["exports"] = bcrypt;
-    /* AMD */ else if (typeof define !== 'undefined' && define["amd"])
-        define(function() { return bcrypt; });
-    /* Global */ else
-        (global["dcodeIO"] = global["dcodeIO"] || {})["bcrypt"] = bcrypt;
+    /**
+     * Decodes a base64 encoded string to up to len bytes of output, using the custom bcrypt alphabet.
+     * @function
+     * @param {string} s String to decode
+     * @param {number} len Maximum output length
+     * @returns {!Array.<number>}
+     * @expose
+     */
+    bcrypt.decodeBase64 = base64_decode;
 
-})(this);
+    return bcrypt;
+}));

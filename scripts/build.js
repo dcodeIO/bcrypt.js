@@ -17,7 +17,7 @@ var scope = {
 console.log("Building bcrypt.js with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "bcrypt.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "bcrypt.js")), filename, scope, srcDir)
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope, srcDir)
 );
 
 // Make isaac build - see: https://github.com/dcodeIO/bcrypt.js/issues/16

@@ -122,13 +122,17 @@ module.exports = {
                 progress.push(n);
             });
         });
-    }/*,
+    },
     
-    "isaac": function(test) {
-        for (var i= 0, n; i<999999; ++i) {
-            n = ((0.5 + isaac() * 2.3283064365386963e-10) * 256) | 0;
-            test.ok(n === n && n >= 0 && n < 256 && n % 1 === 0);
-        }
+    "encodeBase64": function(test) {
+        var str = bcrypt.encodeBase64([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10], 16);
+        test.strictEqual(str, "..CA.uOD/eaGAOmJB.yMBu");
         test.done();
-    }*/
+    },
+
+    "decodeBase64": function(test) {
+        var bytes = bcrypt.decodeBase64("..CA.uOD/eaGAOmJB.yMBv.", 16);
+        test.deepEqual(bytes, [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]);
+        test.done();
+    }
 };
