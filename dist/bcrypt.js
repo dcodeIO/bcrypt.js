@@ -588,7 +588,7 @@
         utfx.calculateUTF8 = function(src) {
             var cp, l=0;
             while ((cp = src()) !== null)
-                l += utfx.calculateCodePoint(cp);
+                l += (cp < 0x80) ? 1 : (cp < 0x800) ? 2 : (cp < 0x10000) ? 3 : 4;
             return l;
         };
 
@@ -601,7 +601,7 @@
         utfx.calculateUTF16asUTF8 = function(src) {
             var n=0, l=0;
             utfx.UTF16toUTF8(src, function(cp) {
-                ++n; l += utfx.calculateCodePoint(cp);
+                ++n; l += (cp < 0x80) ? 1 : (cp < 0x800) ? 2 : (cp < 0x10000) ? 3 : 4;
             });
             return [n,l];
         };
@@ -1019,7 +1019,7 @@
             } else
                 throw err;
         }
-        rounds = 1 << rounds;
+        rounds = Math.pow(2, rounds);
         var P = P_ORIG.slice(),
             S = S_ORIG.slice(),
             i = 0, j;

@@ -406,7 +406,7 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
         } else
             throw err;
     }
-    rounds = 1 << rounds;
+    rounds = Math.pow(2, rounds);
     var P = P_ORIG.slice(),
         S = S_ORIG.slice(),
         i = 0, j;
