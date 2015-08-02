@@ -1019,7 +1019,7 @@
             } else
                 throw err;
         }
-        rounds = 1 << rounds;
+        rounds = (1 << rounds) >>> 0;
         var P = P_ORIG.slice(),
             S = S_ORIG.slice(),
             i = 0, j;
