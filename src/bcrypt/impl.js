@@ -419,7 +419,7 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
      */
     function next() {
         if (progressCallback)
-            progressCallback(i/rounds);
+            progressCallback(i / rounds);
         if (i < rounds) {
             var start = Date.now();
             for (; i < rounds;) {

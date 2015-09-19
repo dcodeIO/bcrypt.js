@@ -195,6 +195,28 @@
     };
 
     /**
+     * Compares two strings of the same length in constant time.
+     * @param {string} known Must be of the correct length
+     * @param {string} unknown Must be the same length as `known`
+     * @returns {boolean}
+     * @inner
+     */
+    function safeStringCompare(known, unknown) {
+    	var right = 0,
+    	    wrong = 0;
+    	for (var i=0, k=known.length; i<k; ++i) {
+    		if (known.charCodeAt(i) === unknown.charCodeAt(i))
+    			++right;
+    		else
+    			++wrong;
+    	}
+    	// Prevent removal of unused variables (never true, actually)
+    	if (right < 0)
+    		return false;
+    	return wrong === 0;
+    }
+
+    /**
      * Synchronously tests a string against a hash.
      * @param {string} s String to compare
      * @param {string} hash Hash to test against
@@ -207,15 +229,7 @@
             throw Error("Illegal arguments: "+(typeof s)+', '+(typeof hash));
         if (hash.length !== 60)
             return false;
-        var comp = bcrypt.hashSync(s, hash.substr(0, hash.length-31)),
-            same = comp.length === hash.length,
-            max_length = (comp.length < hash.length) ? comp.length : hash.length;
-        // to prevent timing attacks, should check entire string
-        // don't exit after found to be false
-        for (var i = 0; i < max_length; ++i)
-            if (comp.length >= i && hash.length >= i && comp[i] != hash[i])
-                same = false;
-        return same;
+        return safeStringCompare(bcrypt.hashSync(s, hash.substr(0, hash.length-31)), hash);
     };
 
     /**
@@ -235,8 +249,15 @@
             nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof hash))));
             return;
         }
+        if (hash.length !== 60) {
+        	nextTick(callback.bind(this, null, false));
+        	return;
+        }
         bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
-            callback(err, hash === comp);
+        	if (err)
+        		callback(err);
+        	else
+            	callback(null, safeStringCompare(comp, hash));
         }, progressCallback);
     };
 
@@ -1032,7 +1053,7 @@
          */
         function next() {
             if (progressCallback)
-                progressCallback(i/rounds);
+                progressCallback(i / rounds);
             if (i < rounds) {
                 var start = Date.now();
                 for (; i < rounds;) {
