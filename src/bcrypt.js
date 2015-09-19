@@ -162,18 +162,18 @@ bcrypt.hash = function(s, salt, callback, progressCallback) {
  * @inner
  */
 function safeStringCompare(known, unknown) {
-	var right = 0,
-	    wrong = 0;
-	for (var i=0, k=known.length; i<k; ++i) {
-		if (known.charCodeAt(i) === unknown.charCodeAt(i))
-			++right;
-		else
-			++wrong;
-	}
-	// Prevent removal of unused variables (never true, actually)
-	if (right < 0)
-		return false;
-	return wrong === 0;
+    var right = 0,
+        wrong = 0;
+    for (var i=0, k=known.length; i<k; ++i) {
+        if (known.charCodeAt(i) === unknown.charCodeAt(i))
+            ++right;
+        else
+            ++wrong;
+    }
+    // Prevent removal of unused variables (never true, actually)
+    if (right < 0)
+        return false;
+    return wrong === 0;
 }
 
 /**
@@ -210,14 +210,14 @@ bcrypt.compare = function(s, hash, callback, progressCallback) {
         return;
     }
     if (hash.length !== 60) {
-    	nextTick(callback.bind(this, null, false));
-    	return;
+        nextTick(callback.bind(this, null, false));
+        return;
     }
     bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
-    	if (err)
-    		callback(err);
-    	else
-        	callback(null, safeStringCompare(comp, hash));
+        if (err)
+            callback(err);
+        else
+            callback(null, safeStringCompare(comp, hash));
     }, progressCallback);
 };
 
