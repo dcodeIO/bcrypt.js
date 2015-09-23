@@ -25,7 +25,7 @@ function random(len) {
             return require("crypto")['randomBytes'](len);
         } catch (e) {}
     /* WCA */ try {
-        var a; (global['crypto']||global['msCrypto'])['getRandomValues'](a = new Uint32Array(len));
+        var a; (window['crypto']||window['msCrypto'])['getRandomValues'](a = new Uint32Array(len));
         return Array.prototype.slice.call(a);
     } catch (e) {}
     /* fallback */ if (!randomFallback)
