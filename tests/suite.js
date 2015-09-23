@@ -47,13 +47,26 @@ module.exports = {
     "compareSync": function(test) {
         var salt1 = bcrypt.genSaltSync(),
             hash1 = bcrypt.hashSync("hello", salt1); // $2a$
-        var salt2 = bcrypt.genSaltSync();
-        salt2 = salt2.substring(0,2)+'y'+salt2.substring(3); // $2y$
-        var hash2 = bcrypt.hashSync("world", salt2);
+        var salt2 = bcrypt.genSaltSync().replace(/\$2a\$/, "$2y$"),
+            hash2 = bcrypt.hashSync("world", salt2);
+        var salt3 = bcrypt.genSaltSync().replace(/\$2a\$/, "$2b$"),
+            hash3 = bcrypt.hashSync("hello world", salt3);
+
+        test.strictEqual(hash1.substring(0,4), "$2a$");
         test.ok(bcrypt.compareSync("hello", hash1));
         test.notOk(bcrypt.compareSync("hello", hash2));
+        test.notOk(bcrypt.compareSync("hello", hash3));
+
+        test.strictEqual(hash2.substring(0,4), "$2y$");
         test.ok(bcrypt.compareSync("world", hash2));
         test.notOk(bcrypt.compareSync("world", hash1));
+        test.notOk(bcrypt.compareSync("world", hash3));
+
+        test.strictEqual(hash3.substring(0,4), "$2b$");
+        test.ok(bcrypt.compareSync("hello world", hash3));
+        test.notOk(bcrypt.compareSync("hello world", hash1));
+        test.notOk(bcrypt.compareSync("hello world", hash2));
+
         test.done();
     },
     
@@ -84,9 +97,7 @@ module.exports = {
     
     "getSalt": function(test) {
         var hash1 = bcrypt.hashSync("hello", bcrypt.genSaltSync());
-        test.log("Hash: "+hash1);
         var salt = bcrypt.getSalt(hash1);
-        test.log("Salt: "+salt);
         var hash2 = bcrypt.hashSync("hello", salt);
         test.equal(hash1, hash2);
         test.done();

@@ -497,10 +497,10 @@ function _hash(s, salt, callback, progressCallback) {
     }
     if (salt.charAt(2) === '$')
         minor = String.fromCharCode(0),
-            offset = 3;
+        offset = 3;
     else {
         minor = salt.charAt(2);
-        if ((minor !== 'a' && minor !== 'y') || salt.charAt(3) !== '$') {
+        if ((minor !== 'a' && minor !== 'b' && minor !== 'y') || salt.charAt(3) !== '$') {
             err = Error("Invalid salt revision: "+salt.substring(2,4));
             if (callback) {
                 nextTick(callback.bind(this, err));
