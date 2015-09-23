@@ -10,6 +10,18 @@ var path = require("path"),
     )*/;
     
 module.exports = {
+
+    "encodeBase64": function(test) {
+        var str = bcrypt.encodeBase64([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10], 16);
+        test.strictEqual(str, "..CA.uOD/eaGAOmJB.yMBu");
+        test.done();
+    },
+
+    "decodeBase64": function(test) {
+        var bytes = bcrypt.decodeBase64("..CA.uOD/eaGAOmJB.yMBv.", 16);
+        test.deepEqual(bytes, [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]);
+        test.done();
+    },
     
     "genSaltSync": function(test) {
         var salt = bcrypt.genSaltSync(10);
@@ -108,16 +120,7 @@ module.exports = {
         test.equal(bcrypt.getRounds(hash1), 10);
         test.done();
     },
-    
-    "compat": function(test) {
-        var pass = fs.readFileSync(path.join(__dirname, "quickbrown.txt"))+"",
-            salt = bcrypt.genSaltSync(),
-            hash1 = binding.hashSync(pass, salt),
-            hash2 = bcrypt.hashSync(pass, salt);
-        test.equal(hash1, hash2);
-        test.done();
-    },
-    
+   
     "progress": function(test) {
         bcrypt.genSalt(12, function(err, salt) {
             test.ok(!err);
@@ -134,16 +137,34 @@ module.exports = {
             });
         });
     },
-    
-    "encodeBase64": function(test) {
-        var str = bcrypt.encodeBase64([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10], 16);
-        test.strictEqual(str, "..CA.uOD/eaGAOmJB.yMBu");
-        test.done();
-    },
 
-    "decodeBase64": function(test) {
-        var bytes = bcrypt.decodeBase64("..CA.uOD/eaGAOmJB.yMBv.", 16);
-        test.deepEqual(bytes, [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]);
-        test.done();
+    "compat": {
+        "quickbrown": function(test) {
+            var pass = fs.readFileSync(path.join(__dirname, "quickbrown.txt"))+"",
+                salt = bcrypt.genSaltSync(),
+                hash1 = binding.hashSync(pass, salt),
+                hash2 = bcrypt.hashSync(pass, salt);
+            test.equal(hash1, hash2);
+            test.done();
+        },
+
+        "roundsOOB": function(test) {
+            var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
+                salt2 = binding.genSaltSync(0);
+            test.strictEqual(salt1.substring(0, 7), "$2a$10$");
+            test.strictEqual(salt2.substring(0, 7), "$2a$10$");
+
+            salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
+            salt2 = bcrypt.genSaltSync(3);
+            test.strictEqual(salt1.substring(0, 7), "$2a$04$");
+            test.strictEqual(salt2.substring(0, 7), "$2a$04$");
+
+            salt1 = bcrypt.genSaltSync(32); // $31$ is upper cap
+            salt2 = bcrypt.genSaltSync(32);
+            test.strictEqual(salt1.substring(0, 7), "$2a$31$");
+            test.strictEqual(salt2.substring(0, 7), "$2a$31$");
+
+            test.done();
+        }
     }
 };

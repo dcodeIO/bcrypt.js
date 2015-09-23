@@ -110,12 +110,13 @@
      * @expose
      */
     bcrypt.genSaltSync = function(rounds, seed_length) {
-        if (typeof rounds === 'undefined')
-            rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
-        else if (typeof rounds !== 'number')
+        rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
+        if (typeof rounds !== 'number')
             throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
-        if (rounds < 4 || rounds > 31)
-            throw Error("Illegal number of rounds (4-31): "+rounds);
+        if (rounds < 4)
+            rounds = 4;
+        else if (rounds > 31)
+            rounds = 31;
         var salt = [];
         salt.push("$2a$");
         if (rounds < 10)
