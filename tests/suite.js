@@ -33,6 +33,12 @@ module.exports = {
             bcrypt.hashSync("hello", 10);
         });
         test.notEqual(bcrypt.hashSync("hello", 10), bcrypt.hashSync("hello", 10));
+        test.throws(function() {
+            bcrypt.hashSync("hello", -1);
+        });
+        test.throws(function() {
+            bcrypt.hashSync("hello", 32);
+        });
         test.done();
     },
     
