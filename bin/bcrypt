@@ -10,8 +10,16 @@ if (process.argv.length < 3) {
         " |_  _ _   _ |_",
         " |_)(_| \\/|_)|_ v"+pkg['version']+" (c) "+pkg['author'],
         "        / |     "
-    ].join('\n')+'\n\n'+" Usage: "+path.basename(process.argv[1])+" <input> [salt]\n");
+    ].join('\n')+'\n\n'+" Usage: "+path.basename(process.argv[1])+" <input> [rounds|salt]\n");
     process.exit(1);
 } else {
-    process.stdout.write(bcrypt.hashSync(process.argv[2], process.argv.length > 3 ? process.argv[3] : bcrypt.genSaltSync())+"\n");
+    var salt;
+    if (process.argv.length > 3) {
+        salt = process.argv[3];
+        var rounds = parseInt(salt, 10);
+        if (rounds == salt)
+            salt = bcrypt.genSaltSync(rounds);
+    } else
+        salt = bcrypt.genSaltSync();
+    process.stdout.write(bcrypt.hashSync(process.argv[2], salt)+"\n");
 }
