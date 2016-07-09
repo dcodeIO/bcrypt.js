@@ -138,6 +138,27 @@ module.exports = {
         });
     },
 
+    "promise": function(test) {
+        bcrypt.genSalt(10)
+        .then(function(salt) {
+            bcrypt.hash("hello", salt)
+            .then(function(hash) {
+                test.ok(hash);
+                bcrypt.compare("hello", hash)
+                .then(function(result) {
+                    test.ok(result);
+                    test.done();
+                }, function(err) {
+                    test.fail(err, null, "promise rejected");
+                });
+            }, function(err) {
+                test.fail(err, null, 'promise rejected');
+            });
+        }, function(err) {
+            test.fail(err, null, "promise rejected");
+        });
+    },
+
     "compat": {
         "quickbrown": function(test) {
             var pass = fs.readFileSync(path.join(__dirname, "quickbrown.txt"))+"",

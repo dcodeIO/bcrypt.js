@@ -47,7 +47,6 @@ randomFallback = /*? if (ISAAC) { */function(len) {
     return a;
 };/*? } else { */null;/*? }*/
 
-
 /**
  * Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
  *  API is available. Please note: It is highly important that the PRNG used is cryptographically secure and that it
@@ -92,6 +91,8 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
  * @param {(number|function(Error, string=))=} rounds Number of rounds to use, defaults to 10 if omitted
  * @param {(number|function(Error, string=))=} seed_length Not supported.
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
+ * @returns {!Promise} If `callback` has been omitted
+ * @throws {Error} If the callback argument is present but not a function
  * @expose
  */
 bcrypt.genSalt = function(rounds, seed_length, callback) {
@@ -101,19 +102,35 @@ bcrypt.genSalt = function(rounds, seed_length, callback) {
     if (typeof rounds === 'function')
         callback = rounds,
         rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
-    if (typeof callback !== 'function')
-        throw Error("Illegal callback: "+typeof(callback));
-    if (typeof rounds !== 'number') {
-        nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof rounds))));
-        return;
+
+    function _async(callback) {
+        nextTick(function() { // Pretty thin, but salting is fast enough
+            if (typeof rounds !== 'number') {
+                callback(Error("Illegal arguments: "+(typeof rounds)));
+                return;
+            }
+            try {
+                callback(null, bcrypt.genSaltSync(rounds));
+            } catch (err) {
+                callback(err);
+            }
+        });
     }
-    nextTick(function() { // Pretty thin, but salting is fast enough
-        try {
-            callback(null, bcrypt.genSaltSync(rounds));
-        } catch (err) {
-            callback(err);
-        }
-    });
+
+    if (callback) {
+        if (typeof callback !== 'function')
+            throw Error("Illegal callback: "+typeof(callback));
+        _async(callback);
+    } else
+        return new Promise(function(resolve, reject) {
+            _async(function(err, res) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(res);
+            });
+        });
 };
 
 /**
@@ -137,22 +154,40 @@ bcrypt.hashSync = function(s, salt) {
  * Asynchronously generates a hash for the given string.
  * @param {string} s String to hash
  * @param {number|string} salt Salt length to generate or salt to use
- * @param {function(Error, string=)} callback Callback receiving the error, if any, and the resulting hash
+ * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
  *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+ * @returns {!Promise} If `callback` has been omitted
+ * @throws {Error} If the callback argument is present but not a function
  * @expose
  */
 bcrypt.hash = function(s, salt, callback, progressCallback) {
-    if (typeof callback !== 'function')
-        throw Error("Illegal callback: "+typeof(callback));
-    if (typeof s === 'string' && typeof salt === 'number')
-        bcrypt.genSalt(salt, function(err, salt) {
+
+    function _async(callback) {
+        if (typeof s === 'string' && typeof salt === 'number')
+            bcrypt.genSalt(salt, function(err, salt) {
+                _hash(s, salt, callback, progressCallback);
+            });
+        else if (typeof s === 'string' && typeof salt === 'string')
             _hash(s, salt, callback, progressCallback);
+        else
+            nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof salt))));
+    }
+
+    if (callback) {
+        if (typeof callback !== 'function')
+            throw Error("Illegal callback: "+typeof(callback));
+        _async(callback);
+    } else
+        return new Promise(function(resolve, reject) {
+            _async(function(err, res) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(res);
+            });
         });
-    else if (typeof s === 'string' && typeof salt === 'string')
-        _hash(s, salt, callback, progressCallback);
-    else
-        nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof salt))));
 };
 
 /**
@@ -197,29 +232,46 @@ bcrypt.compareSync = function(s, hash) {
  * Asynchronously compares the given data against the given hash.
  * @param {string} s Data to compare
  * @param {string} hash Data to be compared to
- * @param {function(Error, boolean)} callback Callback receiving the error, if any, otherwise the result
+ * @param {function(Error, boolean)=} callback Callback receiving the error, if any, otherwise the result
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
  *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
- * @throws {Error} If the callback argument is invalid
+ * @returns {!Promise} If `callback` has been omitted
+ * @throws {Error} If the callback argument is present but not a function
  * @expose
  */
 bcrypt.compare = function(s, hash, callback, progressCallback) {
-    if (typeof callback !== 'function')
-        throw Error("Illegal callback: "+typeof(callback));
-    if (typeof s !== "string" || typeof hash !== "string") {
-        nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof hash))));
-        return;
+
+    function _async(callback) {
+        if (typeof s !== "string" || typeof hash !== "string") {
+            nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof hash))));
+            return;
+        }
+        if (hash.length !== 60) {
+            nextTick(callback.bind(this, null, false));
+            return;
+        }
+        bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
+            if (err)
+                callback(err);
+            else
+                callback(null, safeStringCompare(comp, hash));
+        }, progressCallback);
     }
-    if (hash.length !== 60) {
-        nextTick(callback.bind(this, null, false));
-        return;
-    }
-    bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
-        if (err)
-            callback(err);
-        else
-            callback(null, safeStringCompare(comp, hash));
-    }, progressCallback);
+
+    if (callback) {
+        if (typeof callback !== 'function')
+            throw Error("Illegal callback: "+typeof(callback));
+        _async(callback);
+    } else
+        return new Promise(function(resolve, reject) {
+            _async(function(err, res) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(res);
+            });
+        });
 };
 
 /**
