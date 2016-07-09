@@ -26,9 +26,10 @@ function makePromisePolyfill(method) {
   return function() {
     var args = Array.prototype.slice.call(arguments);
     var isPromise = typeof args[args.length] !== 'function';
+    var promisesSupported = typeof Promise !== 'undefined';
 
-    if (isPromise) return makePromise(method, args);
-    else           return method.apply(bcrypt, args);
+    if (isPromise && promisesSupported) return makePromise(method, args);
+    else                                return method.apply(bcrypt, args);
   }
 }
 
