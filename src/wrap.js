@@ -46,5 +46,7 @@
 
     //? include("bcrypt.js");
 
+    //? include("promisePolyfill.js");
+
     return bcrypt;
 }));
