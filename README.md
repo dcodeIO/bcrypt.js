@@ -115,6 +115,8 @@ bcrypt.hash('bacon', 8, function(err, hash) {
 });
 ```
 
+**Note:** Since bcrypt.js 2.4.0, if the callback argument has been omitted when calling an asynchronous function, the function returns a Promise.
+
 API
 ---
 ### setRandomFallback(random)
@@ -152,6 +154,8 @@ Asynchronously generates a salt.
 | rounds          | *number &#124; function(Error, string=)* | Number of rounds to use, defaults to 10 if omitted 
 | seed_length     | *number &#124; function(Error, string=)* | Not supported. 
 | callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting salt 
+| @returns        | *Promise*       | If `callback` has been omitted
+| **@throws**     | *Error*         | If the callback argument is present but not a function
 
 ### hashSync(s, salt=)
 
@@ -172,7 +176,9 @@ Asynchronously generates a hash for the given string.
 | s               | *string*        | String to hash 
 | salt            | *number &#124; string* | Salt length to generate or salt to use 
 | callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting hash 
-| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms. 
+| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+| @returns        | *Promise*       | If `callback` has been omitted
+| **@throws**     | *Error*         | If the callback argument is present but not a function 
 
 ### compareSync(s, hash)
 
@@ -194,8 +200,9 @@ Asynchronously compares the given data against the given hash.
 | s               | *string*        | Data to compare 
 | hash            | *string*        | Data to be compared to 
 | callback        | *function(Error, boolean)* | Callback receiving the error, if any, otherwise the result 
-| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms. 
-| **@throws**     | *Error*         | If the callback argument is invalid 
+| progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+| @returns        | *Promise*       | If `callback` has been omitted 
+| **@throws**     | *Error*         | If the callback argument is present but not a function
 
 ### getRounds(hash)
 
