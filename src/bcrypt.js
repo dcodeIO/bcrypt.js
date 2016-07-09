@@ -92,7 +92,7 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
  * @param {(number|function(Error, string=))=} seed_length Not supported.
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
  * @returns {!Promise} If `callback` has been omitted
- * @throws {Error} If the callback argument is present but not a function
+ * @throws {Error} If `callback` is present but not a function
  * @expose
  */
 bcrypt.genSalt = function(rounds, seed_length, callback) {
@@ -158,7 +158,7 @@ bcrypt.hashSync = function(s, salt) {
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
  *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
  * @returns {!Promise} If `callback` has been omitted
- * @throws {Error} If the callback argument is present but not a function
+ * @throws {Error} If `callback` is present but not a function
  * @expose
  */
 bcrypt.hash = function(s, salt, callback, progressCallback) {
@@ -236,7 +236,7 @@ bcrypt.compareSync = function(s, hash) {
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
  *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
  * @returns {!Promise} If `callback` has been omitted
- * @throws {Error} If the callback argument is present but not a function
+ * @throws {Error} If `callback` is present but not a function
  * @expose
  */
 bcrypt.compare = function(s, hash, callback, progressCallback) {
@@ -278,7 +278,7 @@ bcrypt.compare = function(s, hash, callback, progressCallback) {
  * Gets the number of rounds used to encrypt the specified hash.
  * @param {string} hash Hash to extract the used number of rounds from
  * @returns {number} Number of rounds used
- * @throws {Error} If hash is not a string
+ * @throws {Error} If `hash` is not a string
  * @expose
  */
 bcrypt.getRounds = function(hash) {

@@ -154,8 +154,8 @@ Asynchronously generates a salt.
 | rounds          | *number &#124; function(Error, string=)* | Number of rounds to use, defaults to 10 if omitted 
 | seed_length     | *number &#124; function(Error, string=)* | Not supported. 
 | callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting salt 
-| @returns        | *Promise*       | If `callback` has been omitted
-| **@throws**     | *Error*         | If the callback argument is present but not a function
+| **@returns**    | *Promise*       | If `callback` has been omitted
+| **@throws**     | *Error*         | If `callback` is present but not a function
 
 ### hashSync(s, salt=)
 
@@ -177,8 +177,8 @@ Asynchronously generates a hash for the given string.
 | salt            | *number &#124; string* | Salt length to generate or salt to use 
 | callback        | *function(Error, string=)* | Callback receiving the error, if any, and the resulting hash 
 | progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
-| @returns        | *Promise*       | If `callback` has been omitted
-| **@throws**     | *Error*         | If the callback argument is present but not a function 
+| **@returns**    | *Promise*       | If `callback` has been omitted
+| **@throws**     | *Error*         | If `callback` is present but not a function
 
 ### compareSync(s, hash)
 
@@ -201,8 +201,8 @@ Asynchronously compares the given data against the given hash.
 | hash            | *string*        | Data to be compared to 
 | callback        | *function(Error, boolean)* | Callback receiving the error, if any, otherwise the result 
 | progressCallback | *function(number)* | Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
-| @returns        | *Promise*       | If `callback` has been omitted 
-| **@throws**     | *Error*         | If the callback argument is present but not a function
+| **@returns**    | *Promise*       | If `callback` has been omitted 
+| **@throws**     | *Error*         | If `callback` is present but not a function
 
 ### getRounds(hash)
 
@@ -212,7 +212,7 @@ Gets the number of rounds used to encrypt the specified hash.
 |-----------------|-----------------|---------------
 | hash            | *string*        | Hash to extract the used number of rounds from 
 | **@returns**    | *number*        | Number of rounds used 
-| **@throws**     | *Error*         | If hash is not a string 
+| **@throws**     | *Error*         | If `hash` is not a string 
 
 ### getSalt(hash)
 
