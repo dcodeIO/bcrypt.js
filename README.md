@@ -115,6 +115,8 @@ bcrypt.hash('bacon', 8, function(err, hash) {
 });
 ```
 
+**Note:** Under the hood, asynchronisation splits a crypto operation into small chunks. After the completion of a chunk, the execution of the next chunk is placed on the back of [JS event loop queue](https://developer.mozilla.org/en/docs/Web/JavaScript/EventLoop), thus efficiently sharing the computational resources with the other operations in the queue.
+
 **Note:** Since bcrypt.js 2.4.0, if the callback argument has been omitted when calling an asynchronous function, the function returns a Promise.
 
 API
