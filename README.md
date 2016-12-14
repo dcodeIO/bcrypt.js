@@ -101,11 +101,16 @@ To check a password:
 ```javascript
 // Load hash from your password DB.
 bcrypt.compare("B4c0/\/", hash, function(err, res) {
-    // res == true
+    // res === true
 });
 bcrypt.compare("not_bacon", hash, function(err, res) {
-    // res = false
+    // res === false
 });
+
+//As of bcryptjs 2.4.0, compare returns a promise if callback is omitted.
+bcrypt.compare("B4c0/\/", hash)
+.then(() => {console.log("Comparison was true")}) //Will be called
+.catch(() => {console.log("Comparison was false")}) //Won't be called
 ```
 
 Auto-gen a salt and hash:
@@ -116,8 +121,6 @@ bcrypt.hash('bacon', 8, function(err, hash) {
 ```
 
 **Note:** Under the hood, asynchronisation splits a crypto operation into small chunks. After the completion of a chunk, the execution of the next chunk is placed on the back of [JS event loop queue](https://developer.mozilla.org/en/docs/Web/JavaScript/EventLoop), thus efficiently sharing the computational resources with the other operations in the queue.
-
-**Note:** Since bcrypt.js 2.4.0, if the callback argument has been omitted when calling an asynchronous function, the function returns a Promise.
 
 API
 ---
