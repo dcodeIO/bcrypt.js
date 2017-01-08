@@ -107,10 +107,10 @@ bcrypt.compare("not_bacon", hash, function(err, res) {
     // res === false
 });
 
-//As of bcryptjs 2.4.0, compare returns a promise if callback is omitted.
-bcrypt.compare("B4c0/\/", hash)
-.then(() => {console.log("Comparison was true")}) //Will be called
-.catch(() => {console.log("Comparison was false")}) //Won't be called
+// As of bcryptjs 2.4.0, compare returns a promise if callback is omitted:
+bcrypt.compare("B4c0/\/", hash).then((res) => {
+    // res === true
+});
 ```
 
 Auto-gen a salt and hash:
