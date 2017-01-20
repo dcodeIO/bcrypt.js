@@ -407,9 +407,18 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
             throw err;
     }
     rounds = (1 << rounds) >>> 0;
-    var P = P_ORIG.slice(),
-        S = S_ORIG.slice(),
-        i = 0, j;
+
+    var P, S, i = 0, j;
+
+    //Use typed arrays when available - huge speedup!
+    if (Int32Array) {
+        P = new Int32Array(P_ORIG);
+        S = new Int32Array(S_ORIG);
+    } else {
+        P = P_ORIG.slice();
+        S = S_ORIG.slice();
+    }
+
     _ekskey(salt, b, P, S);
 
     /**
