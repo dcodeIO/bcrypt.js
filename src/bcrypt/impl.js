@@ -275,19 +275,113 @@ function _encipher(lr, off, P, S) { // This is our bottleneck: 1714/1905 ticks /
         r = lr[off + 1];
 
     l ^= P[0];
+
+    /*
     for (var i=0, k=BLOWFISH_NUM_ROUNDS-2; i<=k;)
         // Feistel substitution on left word
-        n  = S[(l >> 24) & 0xff],
+        n  = S[l >>> 24],
         n += S[0x100 | ((l >> 16) & 0xff)],
         n ^= S[0x200 | ((l >> 8) & 0xff)],
         n += S[0x300 | (l & 0xff)],
         r ^= n ^ P[++i],
         // Feistel substitution on right word
-        n  = S[(r >> 24) & 0xff],
+        n  = S[r >>> 24],
         n += S[0x100 | ((r >> 16) & 0xff)],
         n ^= S[0x200 | ((r >> 8) & 0xff)],
         n += S[0x300 | (r & 0xff)],
         l ^= n ^ P[++i];
+    */
+
+    //The following is an unrolled version of the above loop.
+    //Iteration 0
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[1];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[2];
+    //Iteration 1
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[3];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[4];
+    //Iteration 2
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[5];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[6];
+    //Iteration 3
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[7];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[8];
+    //Iteration 4
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[9];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[10];
+    //Iteration 5
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[11];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[12];
+    //Iteration 6
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[13];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[14];
+    //Iteration 7
+    n  = S[l >>> 24];
+    n += S[0x100 | ((l >> 16) & 0xff)];
+    n ^= S[0x200 | ((l >> 8) & 0xff)];
+    n += S[0x300 | (l & 0xff)];
+    r ^= n ^ P[15];
+    n  = S[r >>> 24];
+    n += S[0x100 | ((r >> 16) & 0xff)];
+    n ^= S[0x200 | ((r >> 8) & 0xff)];
+    n += S[0x300 | (r & 0xff)];
+    l ^= n ^ P[16];
+
     lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
     lr[off + 1] = l;
     return lr;
@@ -407,9 +501,18 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
             throw err;
     }
     rounds = (1 << rounds) >>> 0;
-    var P = P_ORIG.slice(),
-        S = S_ORIG.slice(),
-        i = 0, j;
+
+    var P, S, i = 0, j;
+
+    //Use typed arrays when available - huge speedup!
+    if (Int32Array) {
+        P = new Int32Array(P_ORIG);
+        S = new Int32Array(S_ORIG);
+    } else {
+        P = P_ORIG.slice();
+        S = S_ORIG.slice();
+    }
+
     _ekskey(salt, b, P, S);
 
     /**
