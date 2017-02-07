@@ -3,7 +3,7 @@ bcrypt.js
 Optimized bcrypt in JavaScript with zero dependencies. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt)
 binding on node.js and also working in the browser.
 
-<a href="https://travis-ci.org/dcodeIO/bcrypt.js"><img alt="build static" src="https://travis-ci.org/dcodeIO/bcrypt.js.svg?branch=master" /></a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dcode%40dcode.io&item_name=Open%20Source%20Software%20Donation&item_number=dcodeIO%2Fbcrypt.js"><img alt="donate ❤" src="https://img.shields.io/badge/donate-❤-ff2244.svg"></a>
+<a href="https://travis-ci.org/dcodeIO/bcrypt.js"><img alt="build static" src="https://travis-ci.org/dcodeIO/bcrypt.js.svg?branch=master" /></a> <a href="https://npmjs.org/package/bcryptjs"><img src="https://img.shields.io/npm/v/bcryptjs.svg" alt=""></a> <a href="https://npmjs.org/package/bcryptjs"><img src="https://img.shields.io/npm/dm/bcryptjs.svg" alt=""></a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dcode%40dcode.io&item_name=Open%20Source%20Software%20Donation&item_number=dcodeIO%2Fbcrypt.js"><img alt="donate ❤" src="https://img.shields.io/badge/donate-❤-ff2244.svg"></a>
 
 
 Security considerations

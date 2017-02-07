@@ -1,7 +1,7 @@
 {
     "name": "bcryptjs",
     "description": "Optimized bcrypt in plain JavaScript with zero dependencies.",
-    "version": "2.4.2",
+    "version": "2.4.3",
     "main": "dist/bcrypt.min.js",
     "license": "New-BSD",
     "homepage": "http://dcode.io/",
