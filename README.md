@@ -12,8 +12,8 @@ Besides incorporating a salt to protect against rainbow table attacks, bcrypt is
 iteration count can be increased to make it slower, so it remains resistant to brute-force search attacks even with
 increasing computation power. ([see](http://en.wikipedia.org/wiki/Bcrypt))
 
-While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower ([about 2.7
-times](https://github.com/dcodeIO/bcrypt.js/wiki/Benchmark)), effectively reducing the number of iterations that can be
+While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower ([about 25%
+](https://github.com/dcodeIO/bcrypt.js/wiki/Benchmark)), effectively reducing the number of iterations that can be
 processed in an equal time span.
 
 The maximum input length is 72 bytes (note that UTF8 encoded characters use up to 4 bytes) and the length of generated
