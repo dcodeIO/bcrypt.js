@@ -101,14 +101,14 @@ bcrypt.genSalt = function(rounds, seed_length, callback) {
         seed_length = undefined; // Not supported.
     if (typeof rounds === 'function')
         callback = rounds,
+        rounds = undefined;
+    if (typeof rounds === 'undefined')
         rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
+    else if (typeof rounds !== 'number')
+        throw Error("illegal arguments: "+(typeof rounds));
 
     function _async(callback) {
         nextTick(function() { // Pretty thin, but salting is fast enough
-            if (typeof rounds !== 'number') {
-                callback(Error("Illegal arguments: "+(typeof rounds)));
-                return;
-            }
             try {
                 callback(null, bcrypt.genSaltSync(rounds));
             } catch (err) {

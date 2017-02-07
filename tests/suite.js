@@ -147,7 +147,13 @@ module.exports = {
                 bcrypt.compare("hello", hash)
                 .then(function(result) {
                     test.ok(result);
-                    test.done();
+                    bcrypt.genSalt(/* no args */)
+                    .then(function(salt) {
+                        test.ok(salt);
+                        test.done();
+                    }, function(err) {
+                        test.fail(err, null, "promise rejected");
+                    });
                 }, function(err) {
                     test.fail(err, null, "promise rejected");
                 });
