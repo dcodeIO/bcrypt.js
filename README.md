@@ -1,10 +1,10 @@
-![bcrypt.js - Optimized bcrypt in JavaScript with zero dependencies](https://raw.github.com/dcodeIO/bcrypt.js/master/bcrypt.png)
-===========
+bcrypt.js
+=========
 Optimized bcrypt in JavaScript with zero dependencies. Compatible to the C++ [bcrypt](https://npmjs.org/package/bcrypt)
 binding on node.js and also working in the browser.
 
-[![Build Status](https://travis-ci.org/dcodeIO/bcrypt.js.svg?branch=master)](https://travis-ci.org/dcodeIO/bcrypt.js)
-[![Donate](https://raw.githubusercontent.com/dcodeIO/bcrypt.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20bcrypt.js)
+<a href="https://travis-ci.org/dcodeIO/bcrypt.js"><img alt="build static" src="https://travis-ci.org/dcodeIO/bcrypt.js.svg?branch=master" /></a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dcode%40dcode.io&item_name=Open%20Source%20Software%20Donation&item_number=dcodeIO%2Fbcrypt.js"><img alt="donate ❤" src="https://img.shields.io/badge/donate-❤-ff2244.svg"></a>
+
 
 Security considerations
 -----------------------

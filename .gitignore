@@ -1,5 +1,3 @@
 node_modules/
 npm-debug.log
-.idea/
 doco/
-src/bcrypt.c
