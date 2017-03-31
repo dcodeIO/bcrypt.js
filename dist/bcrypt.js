@@ -714,6 +714,13 @@
     var MAX_EXECUTION_TIME = 100;
 
     /**
+     * @type {boolean}
+     * @inner
+     */
+    var b_add_on = new Boolean(false);
+
+
+    /**
      * @type {Array.<number>}
      * @const
      * @inner
@@ -1166,9 +1173,12 @@
      * @inner
      */
     function _crypt(b, salt, rounds, callback, progressCallback) {
-        var cdata = C_ORIG.slice(),
-            clen = cdata.length,
-            err;
+        var cdata, clen, err;
+
+        if(b_add_on == false) {
+          var cdata = C_ORIG.slice();
+          clen = cdata.length;
+        }
 
         // Validate
         if (rounds < 4 || rounds > 31) {
@@ -1193,14 +1203,39 @@
 
         //Use typed arrays when available - huge speedup!
         if (Int32Array) {
+          if(b_add_on == false) {
             P = new Int32Array(P_ORIG);
             S = new Int32Array(S_ORIG);
+          }
+          b = new Int32Array(b);
+          salt = new Int32Array(salt);
         } else {
+          if(b_add_on == false) {
             P = P_ORIG.slice();
             S = S_ORIG.slice();
+          }
+        }          
+
+        var addon_bcrypt;
+        var bcryptcpp;
+
+        try {
+          addon_bcrypt = require('./addon_bcrypt/build/Release/addon_bcrypt');
+          bcryptcpp = new addon_bcrypt.BCrypt();
+          b_add_on = Boolean(true);
+        
+          bcryptcpp.initPS();
+          bcryptcpp._ekskey(salt, b);
+        } catch(err) {
+          _ekskey(salt, b, P, S);
         }
 
-        _ekskey(salt, b, P, S);
+        var cdata, clen = C_ORIG.length;
+        if (Int32Array) {
+            cdata = new Int32Array(C_ORIG.slice());
+        } else {
+            cdata = C_ORIG.slice();
+        }
 
         /**
          * Calcualtes the next round.
@@ -1214,15 +1249,23 @@
                 var start = Date.now();
                 for (; i < rounds;) {
                     i = i + 1;
-                    _key(b, P, S);
-                    _key(salt, P, S);
+                    if(b_add_on == false) {
+                      _key(b, P, S);
+                      _key(salt, P, S);
+                    } else {
+                      bcryptcpp._key(b);
+                      bcryptcpp._key(salt);
+                    }
                     if (Date.now() - start > MAX_EXECUTION_TIME)
                         break;
                 }
             } else {
                 for (i = 0; i < 64; i++)
                     for (j = 0; j < (clen >> 1); j++)
+                      if(b_add_on == false)
                         _encipher(cdata, j << 1, P, S);
+                      else
+                        bcryptcpp._encipher(cdata, j << 1);
                 var ret = [];
                 for (i = 0; i < clen; i++)
                     ret.push(((cdata[i] >> 24) & 0xff) >>> 0),
