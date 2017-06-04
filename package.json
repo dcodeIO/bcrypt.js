@@ -26,6 +26,9 @@
     "crypt",
     "crypto"
   ],
+  "bin": {
+    "bcrypt": "bin/bcrypt"
+  },
   "main": "index.js",
   "browser": "dist/bcrypt.js",
   "dependencies": {},
