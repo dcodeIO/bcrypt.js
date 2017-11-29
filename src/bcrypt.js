@@ -198,18 +198,11 @@ bcrypt.hash = function(s, salt, callback, progressCallback) {
  * @inner
  */
 function safeStringCompare(known, unknown) {
-    var right = 0,
-        wrong = 0;
-    for (var i=0, k=known.length; i<k; ++i) {
-        if (known.charCodeAt(i) === unknown.charCodeAt(i))
-            ++right;
-        else
-            ++wrong;
+    var diff = known.length ^ unknown.length;
+    for (var i=0, i<known.length; ++i) {
+        diff |= known.charCodeAt(i) ^ unknown.charCodeAt(i);
     }
-    // Prevent removal of unused variables (never true, actually)
-    if (right < 0)
-        return false;
-    return wrong === 0;
+    return diff === 0;
 }
 
 /**
