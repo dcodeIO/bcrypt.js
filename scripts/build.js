@@ -33,5 +33,5 @@ scope = { VERSION: pkg.version };
 console.log("Updating bower.json with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(rootDir, "bower.json"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "bower.json")), filename, scope, srcDir)
+    MetaScript.transform(fs.readFileSync(path.join(srcDir, "bower.json.template")), path.join(srcDir, "bower.json"), scope, srcDir)
 );
