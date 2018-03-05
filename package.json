@@ -33,11 +33,10 @@
   "browser": "dist/bcrypt.js",
   "dependencies": {},
   "devDependencies": {
-    "testjs": "~1",
-    "closurecompiler": "~1",
-    "metascript": "~0.18",
     "bcrypt": "latest",
-    "utfx": "~1"
+    "closurecompiler": "~1",
+    "metascript": "~1.0.0",
+    "testjs": "~1"
   },
   "license": "MIT",
   "scripts": {

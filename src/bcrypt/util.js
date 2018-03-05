@@ -8,26 +8,17 @@ var nextTick = typeof process !== 'undefined' && process && typeof process.nextT
     ? (typeof setImmediate === 'function' ? setImmediate : process.nextTick)
     : setTimeout;
 
+//? include("util/utf8.js");
+
 /**
  * Converts a JavaScript string to UTF8 bytes.
+ * @function
  * @param {string} str String
  * @returns {!Array.<number>} UTF8 bytes
  * @inner
  */
-function stringToBytes(str) {
-    var out = [],
-        i = 0;
-    utfx.encodeUTF16toUTF8(function() {
-        if (i >= str.length) return null;
-        return str.charCodeAt(i++);
-    }, function(b) {
-        out.push(b);
-    });
-    return out;
-}
+var stringToBytes = utf8Array;
 
 //? include("util/base64.js");
 
-//? include("../../node_modules/utfx/dist/utfx-embeddable.js");
-
-Date.now = Date.now || function() { return +new Date; }; 
+Date.now = Date.now || function() { return +new Date; };
