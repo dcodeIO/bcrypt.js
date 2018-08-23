@@ -1,7 +1,8 @@
+//? if (typeof ISAAC === 'undefined') ISAAC = false;
 /*
  Copyright (c) 2012 Nevins Bartolomeo <nevins.bartolomeo@gmail.com>
  Copyright (c) 2012 Shane Girish <shaneGirish@gmail.com>
- Copyright (c) 2013 Daniel Wirtz <dcode@dcode.io>
+ Copyright (c) 2014 Daniel Wirtz <dcode@dcode.io>
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
@@ -26,4 +27,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module.exports = require("./dist/bcrypt.js");
+/**
+ * @license bcrypt.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
+ * Released under the Apache License, Version 2.0
+ * see: https://github.com/dcodeIO/bcrypt.js for details
+ */
+ 'use strict';
+
+ module.exports = require('./src/bcrypt.js');

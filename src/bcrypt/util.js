@@ -1,10 +1,13 @@
+var utf8Utils = require('./util/utf8.js');
+
 /**
  * Continues with the callback on the next tick.
  * @function
  * @param {function(...[*])} callback Callback to execute
  * @inner
  */
-var nextTick = typeof process !== 'undefined' && process && typeof process.nextTick === 'function'
+function Utils() {}
+Utils.prototype.nextTick = typeof process !== 'undefined' && process && typeof process.nextTick === 'function'
     ? (typeof setImmediate === 'function' ? setImmediate : process.nextTick)
     : setTimeout;
 
@@ -17,8 +20,10 @@ var nextTick = typeof process !== 'undefined' && process && typeof process.nextT
  * @returns {!Array.<number>} UTF8 bytes
  * @inner
  */
-var stringToBytes = utf8Array;
+Utils.prototype.stringToBytes = utf8Utils.getBuffer.bind(utf8Utils);
 
 //? include("util/base64.js");
 
 Date.now = Date.now || function() { return +new Date; };
+
+module.exports = new Utils();

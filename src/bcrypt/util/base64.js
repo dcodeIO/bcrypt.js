@@ -1,5 +1,5 @@
 // A base64 implementation for the bcrypt algorithm. This is partly non-standard.
-
+function Base64Utils() {}
 /**
  * bcrypt's own non-standard base64 dictionary.
  * @type {!Array.<string>}
@@ -35,7 +35,7 @@ var stringFromCharCode = String.fromCharCode;
  * @returns {string}
  * @inner
  */
-function base64_encode(b, len) {
+Base64Utils.prototype.encode = function(b, len) {
     var off = 0,
         rs = [],
         c1, c2;
@@ -72,7 +72,7 @@ function base64_encode(b, len) {
  * @returns {!Array.<number>}
  * @inner
  */
-function base64_decode(s, len) {
+Base64Utils.prototype.decode = function(s, len) {
     var off = 0,
         slen = s.length,
         olen = 0,
@@ -113,3 +113,5 @@ function base64_decode(s, len) {
         res.push(rs[off].charCodeAt(0));
     return res;
 }
+
+module.exports = new Base64Utils();
