@@ -82,7 +82,7 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
     salt = salt.concat(rounds.toString());
     salt = salt.concat('$');
     salt = salt.concat(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
-    return salt.join('');
+    return salt;
 };
 
 /**
