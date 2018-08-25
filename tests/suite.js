@@ -179,7 +179,7 @@ module.exports = {
             var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
                 salt2 = binding.genSaltSync(0);
             test.strictEqual(salt1.substring(0, 7), "$2a$10$");
-            test.strictEqual(salt2.substring(0, 7), "$2a$10$");
+            test.strictEqual(salt2.substring(0, 7), "$2b$10$");
 
             salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
             salt2 = bcrypt.genSaltSync(3);

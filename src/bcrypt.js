@@ -75,13 +75,13 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
         rounds = 4;
     else if (rounds > 31)
         rounds = 31;
-    var salt = [];
-    salt.push("$2a$");
+    var salt = '';
+    salt = salt.concat("$2a$");
     if (rounds < 10)
-        salt.push("0");
-    salt.push(rounds.toString());
-    salt.push('$');
-    salt.push(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+        salt = salt.concat("0");
+    salt = salt.concat(rounds.toString());
+    salt = salt.concat('$');
+    salt = salt.concat(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
     return salt.join('');
 };
 
