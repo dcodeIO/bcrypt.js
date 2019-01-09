@@ -79,7 +79,7 @@ bcrypt.compareSync("not_bacon", hash); // false
 Auto-gen a salt and hash:
 
 ```javascript
-var hash = bcrypt.hashSync('bacon', 8);
+var hash = bcrypt.hashSync('bacon', 10);
 ```
 
 Usage - Async
@@ -115,7 +115,7 @@ bcrypt.compare("B4c0/\/", hash).then((res) => {
 Auto-gen a salt and hash:
 
 ```javascript
-bcrypt.hash('bacon', 8, function(err, hash) {
+bcrypt.hash('bacon', 10, function(err, hash) {
 });
 ```
 
