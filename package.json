@@ -1,21 +1,14 @@
 {
-  "name": "bcryptjs",
-  "description": "Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to 'bcrypt'.",
-  "version": "2.4.4",
-  "author": "Daniel Wirtz <dcode@dcode.io>",
-  "contributors": [
-    "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",
-    "Alex Murray <> (https://github.com/alexmurray)",
-    "Nicolas Pelletier <> (https://github.com/NicolasPelletier)",
-    "Josh Rogers <> (https://github.com/geekymole)",
-    "Noah Isaacson <noah@nisaacson.com> (https://github.com/nisaacson)"
-  ],
+  "name": "bcryptjs-minor",
+  "description": "Fork of bcryptjs by Daniel Wirtz",
+  "version": "1.0.0",
+  "author": "Ben Lanning <benjaminlanning@gmail.com>",
   "repository": {
     "type": "url",
-    "url": "https://github.com/dcodeIO/bcrypt.js.git"
+    "url": "https://github.com/WebMatrixware/bcrypt.js.git"
   },
   "bugs": {
-    "url": "https://github.com/dcodeIO/bcrypt.js/issues"
+    "url": "https://github.com/WebMatrixware/bcrypt.js/issues"
   },
   "keywords": [
     "bcrypt",
