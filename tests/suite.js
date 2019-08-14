@@ -199,14 +199,14 @@ module.exports = {
             var error = false;
             test.strictEqual(salt.substring(0, 7), "$2a$08$");
           
-            salt = bcrypt.genSaltSync(8, 0, 'a'); // set salt with specific a version should result in '2a' salt
+            salt = bcrypt.genSaltSync(8, 'a'); // set salt with specific a version should result in '2a' salt
             test.strictEqual(salt.substring(0, 7), "$2a$08$");
           
-            salt = bcrypt.genSaltSync(8, 0, 'b'); // set salt with specific a version should result in '2b' salt
+            salt = bcrypt.genSaltSync(8, 'b'); // set salt with specific a version should result in '2b' salt
             test.strictEqual(salt.substring(0, 7), "$2b$08$");
           
             try {
-              salt = bcrypt.genSaltSync(8, 0, 'c'); // set salt with invalid specific version, should throw error
+              salt = bcrypt.genSaltSync(8, 'c'); // set salt with invalid specific version, should throw error
             } catch (e) {
               if (e) {
                 error = true;
