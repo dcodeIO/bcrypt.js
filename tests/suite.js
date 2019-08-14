@@ -177,9 +177,9 @@ module.exports = {
 
         "roundsOOB": function(test) {
             var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
-                salt2 = binding.genSaltSync(0);
+                salt2 = binding.genSaltSync(0); // What is the reason for this test being run against a different library?
             test.strictEqual(salt1.substring(0, 7), "$2a$10$");
-            test.strictEqual(salt2.substring(0, 7), "$2a$10$");
+            test.strictEqual(salt2.substring(0, 7), "$2b$10$");
 
             salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
             salt2 = bcrypt.genSaltSync(3);
@@ -190,6 +190,30 @@ module.exports = {
             salt2 = bcrypt.genSaltSync(32);
             test.strictEqual(salt1.substring(0, 7), "$2a$31$");
             test.strictEqual(salt2.substring(0, 7), "$2a$31$");
+
+            test.done();
+        },
+      
+        "versions": function(test) {
+            var salt = bcrypt.genSaltSync(8); // set salt with default settings should result in '2a' salt
+            var error = false;
+            test.strictEqual(salt.substring(0, 7), "$2a$08$");
+          
+            salt = bcrypt.genSaltSync(8, 0, 'a'); // set salt with specific a version should result in '2a' salt
+            test.strictEqual(salt.substring(0, 7), "$2a$08$");
+          
+            salt = bcrypt.genSaltSync(8, 0, 'b'); // set salt with specific a version should result in '2b' salt
+            test.strictEqual(salt.substring(0, 7), "$2b$08$");
+          
+            try {
+              salt = bcrypt.genSaltSync(8, 0, 'c'); // set salt with invalid specific version, should throw error
+            } catch (e) {
+              if (e) {
+                error = true;
+              }
+            } finally {
+              test.ok(error); // for the code to work as designed there should be an error thrown for invalid versions
+            }
 
             test.done();
         }
