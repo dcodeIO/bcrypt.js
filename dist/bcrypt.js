@@ -107,16 +107,22 @@
      * @returns {string} Resulting salt
      * @throws {Error} If a random fallback is required but not set
      */
-    bcrypt.genSaltSync = function(rounds, seed_length) {
+    bcrypt.genSaltSync = function(rounds, version) {
         rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
         if (typeof rounds !== 'number')
-            throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
+            throw Error("Illegal arguments: ["+(typeof rounds)+"], "+rounds.toString();
         if (rounds < 4)
             rounds = 4;
         else if (rounds > 31)
             rounds = 31;
         var salt = [];
-        salt.push("$2a$");
+        if (typeof(version) === 'undefined' || version === 'a') {
+          salt.push("$2a$");
+        } else if (version === 'b') {
+          salt.push("$2b$");
+        } else {
+          throw Error("Illegal arguments: ["+(typeof(version))+"], "+version.toString());
+        }
         if (rounds < 10)
             salt.push("0");
         salt.push(rounds.toString());
