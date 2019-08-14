@@ -103,26 +103,27 @@
     /**
      * Synchronously generates a salt.
      * @param {number=} rounds Number of rounds to use, defaults to 10 if omitted
-     * @param {number=} seed_length Not supported.
+     * @param {string=} minor Minor version to use, defaults to a if ommitted
      * @returns {string} Resulting salt
      * @throws {Error} If a random fallback is required but not set
      */
-    bcrypt.genSaltSync = function(rounds, version) {
+    bcrypt.genSaltSync = function(rounds, minor) {
         rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
         if (typeof rounds !== 'number')
-            throw Error("Illegal arguments: ["+(typeof rounds)+"], "+rounds.toString();
+            throw Error("Illegal arguments: ["+(typeof rounds)+"], "+rounds.toString());
         if (rounds < 4)
             rounds = 4;
         else if (rounds > 31)
             rounds = 31;
         var salt = [];
-        if (typeof(version) === 'undefined' || version === 'a') {
+      
+        if (typeof(minor) === 'undefined' || typeof(minor) === null || minor === 'a')
           salt.push("$2a$");
-        } else if (version === 'b') {
+        else if (minor === 'b')
           salt.push("$2b$");
-        } else {
-          throw Error("Illegal arguments: ["+(typeof(version))+"], "+version.toString());
-        }
+        else
+          throw Error("Illegal arguments: ["+(typeof(minor))+"], "+minor.toString());
+      
         if (rounds < 10)
             salt.push("0");
         salt.push(rounds.toString());
@@ -134,27 +135,27 @@
     /**
      * Asynchronously generates a salt.
      * @param {(number|function(Error, string=))=} rounds Number of rounds to use, defaults to 10 if omitted
-     * @param {(number|function(Error, string=))=} seed_length Not supported.
+     * @param {(string|function(Error, string=))=} minor Minor version to use, defaults to a if ommitted
      * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
      * @returns {!Promise} If `callback` has been omitted
      * @throws {Error} If `callback` is present but not a function
      */
-    bcrypt.genSalt = function(rounds, seed_length, callback) {
-        if (typeof seed_length === 'function')
-            callback = seed_length,
-            seed_length = undefined; // Not supported.
+    bcrypt.genSalt = function(rounds, minor, callback) {
+        if (typeof minor === 'function')
+            callback = minor,
+            minor = undefined;
         if (typeof rounds === 'function')
             callback = rounds,
             rounds = undefined;
         if (typeof rounds === 'undefined')
             rounds = GENSALT_DEFAULT_LOG2_ROUNDS;
-        else if (typeof rounds !== 'number')
+        else if (typeof rounds !== 'number') // Why check this here? Already tested in genSaltSync that you pass it to...
             throw Error("illegal arguments: "+(typeof rounds));
 
         function _async(callback) {
             nextTick(function() { // Pretty thin, but salting is fast enough
                 try {
-                    callback(null, bcrypt.genSaltSync(rounds));
+                    callback(null, bcrypt.genSaltSync(rounds, minor));
                 } catch (err) {
                     callback(err);
                 }
