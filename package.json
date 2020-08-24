@@ -34,7 +34,7 @@
   "dependencies": {},
   "devDependencies": {
     "bcrypt": "latest",
-    "closurecompiler": "~1",
+    "google-closure-compiler": ">=20200719",
     "metascript": "~1.0.0",
     "testjs": "~1"
   },
@@ -42,7 +42,7 @@
   "scripts": {
     "test": "node node_modules/testjs/bin/testjs",
     "build": "node scripts/build.js",
-    "compile": "node node_modules/closurecompiler/bin/ccjs dist/bcrypt.js --compilation_level=SIMPLE_OPTIMIZATIONS --create_source_map=dist/bcrypt.min.map > dist/bcrypt.min.js",
+    "compile": "node node_modules/google-closure-compiler/cli.js dist/bcrypt.js --compilation_level=SIMPLE_OPTIMIZATIONS --create_source_map=dist/bcrypt.min.map > dist/bcrypt.min.js",
     "compress": "gzip -c -9 dist/bcrypt.min.js > dist/bcrypt.min.js.gz",
     "make": "npm run build && npm run compile && npm run compress && npm test"
   }
