@@ -76,6 +76,7 @@ bcrypt.compareSync = function(s, hash) {};
 bcrypt.compare = function(s, hash, callback) {};
 
 /**
+ * @param {string} s
  * @param {string} hash
  * @returns {number}
  * @throws {Error}
