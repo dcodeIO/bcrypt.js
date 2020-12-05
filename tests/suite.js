@@ -177,7 +177,7 @@ module.exports = {
 
         "roundsOOB": function(test) {
             var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
-                salt2 = binding.genSaltSync(0);
+                salt2 = binding.genSaltSync(0, 'a');
             test.strictEqual(salt1.substring(0, 7), "$2a$10$");
             test.strictEqual(salt2.substring(0, 7), "$2a$10$");
 
