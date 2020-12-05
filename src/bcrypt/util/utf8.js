@@ -1,5 +1,6 @@
+function Utf8Utils() {}
 /** Calculates the byte length of a string encoded as UTF8. */
-function utf8Length(string) {
+Utf8Utils.prototype.getLength = function(string) {
   var len = 0,
       c = 0;
   for (var i = 0; i < string.length; ++i) {
@@ -21,10 +22,10 @@ function utf8Length(string) {
 }
 
 /** Converts a string to an array of UTF8 bytes. */
-function utf8Array(string) {
+Utf8Utils.prototype.getBuffer = function(string) {
   var offset = 0,
       c1, c2;
-  var buffer = new Array(utf8Length(string));
+  var buffer = new Array(this.getLength(string));
   for (var i = 0, k = string.length; i < k; ++i) {
       c1 = string.charCodeAt(i);
       if (c1 < 128) {
@@ -50,3 +51,5 @@ function utf8Array(string) {
   }
   return buffer;
 }
+
+module.exports = new Utf8Utils();

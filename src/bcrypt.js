@@ -1,8 +1,11 @@
-/**
- * bcrypt namespace.
- * @type {Object.<string,*>}
- */
-var bcrypt = {};
+var utils = require('./bcrypt/util.js');
+var base64Utils = require('./bcrypt/util/base64.js');
+var impl = require('./bcrypt/impl.js');
+var constants = require('./bcrypt/constants.js');
+var BCRYPT_SALT_LEN = constants.BCRYPT_SALT_LEN;
+var GENSALT_DEFAULT_LOG2_ROUNDS = constants.GENSALT_DEFAULT_LOG2_ROUNDS;
+
+function Bcrypt() {}
 
 /**
  * The random implementation to use as a fallback.
@@ -56,7 +59,7 @@ randomFallback = /*? if (ISAAC) { */function(len) {
  * @see http://nodejs.org/api/crypto.html
  * @see http://www.w3.org/TR/WebCryptoAPI/
  */
-bcrypt.setRandomFallback = function(random) {
+Bcrypt.prototype.setRandomFallback = function(random) {
     randomFallback = random;
 };
 
@@ -67,7 +70,7 @@ bcrypt.setRandomFallback = function(random) {
  * @returns {string} Resulting salt
  * @throws {Error} If a random fallback is required but not set
  */
-bcrypt.genSaltSync = function(rounds, seed_length) {
+Bcrypt.prototype.genSaltSync = function(rounds, seed_length) {
     rounds = rounds || GENSALT_DEFAULT_LOG2_ROUNDS;
     if (typeof rounds !== 'number')
         throw Error("Illegal arguments: "+(typeof rounds)+", "+(typeof seed_length));
@@ -81,7 +84,7 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
         salt.push("0");
     salt.push(rounds.toString());
     salt.push('$');
-    salt.push(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+    salt.push(base64Utils.encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
     return salt.join('');
 };
 
@@ -93,7 +96,9 @@ bcrypt.genSaltSync = function(rounds, seed_length) {
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
  */
-bcrypt.genSalt = function(rounds, seed_length, callback) {
+Bcrypt.prototype.genSalt = function(rounds, seed_length, callback) {
+    var self = this;
+
     if (typeof seed_length === 'function')
         callback = seed_length,
         seed_length = undefined; // Not supported.
@@ -106,9 +111,9 @@ bcrypt.genSalt = function(rounds, seed_length, callback) {
         throw Error("illegal arguments: "+(typeof rounds));
 
     function _async(callback) {
-        nextTick(function() { // Pretty thin, but salting is fast enough
+        utils.nextTick(function() { // Pretty thin, but salting is fast enough
             try {
-                callback(null, bcrypt.genSaltSync(rounds));
+                callback(null, self.genSaltSync(rounds));
             } catch (err) {
                 callback(err);
             }
@@ -137,14 +142,14 @@ bcrypt.genSalt = function(rounds, seed_length, callback) {
  * @param {(number|string)=} salt Salt length to generate or salt to use, default to 10
  * @returns {string} Resulting hash
  */
-bcrypt.hashSync = function(s, salt) {
+Bcrypt.prototype.hashSync = function(s, salt) {
     if (typeof salt === 'undefined')
         salt = GENSALT_DEFAULT_LOG2_ROUNDS;
     if (typeof salt === 'number')
-        salt = bcrypt.genSaltSync(salt);
+        salt = this.genSaltSync(salt);
     if (typeof s !== 'string' || typeof salt !== 'string')
         throw Error("Illegal arguments: "+(typeof s)+', '+(typeof salt));
-    return _hash(s, salt);
+    return impl.hash(s, salt);
 };
 
 /**
@@ -157,17 +162,18 @@ bcrypt.hashSync = function(s, salt) {
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
  */
-bcrypt.hash = function(s, salt, callback, progressCallback) {
+Bcrypt.prototype.hash = function(s, salt, callback, progressCallback) {
+    var self = this;
 
     function _async(callback) {
         if (typeof s === 'string' && typeof salt === 'number')
-            bcrypt.genSalt(salt, function(err, salt) {
-                _hash(s, salt, callback, progressCallback);
+            self.genSalt(salt, function(err, salt) {
+                impl.hash(s, salt, callback, progressCallback);
             });
         else if (typeof s === 'string' && typeof salt === 'string')
-            _hash(s, salt, callback, progressCallback);
+            impl.hash(s, salt, callback, progressCallback);
         else
-            nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof salt))));
+            utils.nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof salt))));
     }
 
     if (callback) {
@@ -208,12 +214,12 @@ function safeStringCompare(known, unknown) {
  * @returns {boolean} true if matching, otherwise false
  * @throws {Error} If an argument is illegal
  */
-bcrypt.compareSync = function(s, hash) {
+Bcrypt.prototype.compareSync = function(s, hash) {
     if (typeof s !== "string" || typeof hash !== "string")
         throw Error("Illegal arguments: "+(typeof s)+', '+(typeof hash));
     if (hash.length !== 60)
         return false;
-    return safeStringCompare(bcrypt.hashSync(s, hash.substr(0, hash.length-31)), hash);
+    return safeStringCompare(this.hashSync(s, hash.substr(0, hash.length-31)), hash);
 };
 
 /**
@@ -226,18 +232,19 @@ bcrypt.compareSync = function(s, hash) {
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
  */
-bcrypt.compare = function(s, hash, callback, progressCallback) {
+Bcrypt.prototype.compare = function(s, hash, callback, progressCallback) {
+    var self = this;
 
     function _async(callback) {
         if (typeof s !== "string" || typeof hash !== "string") {
-            nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof hash))));
+            utils.nextTick(callback.bind(this, Error("Illegal arguments: "+(typeof s)+', '+(typeof hash))));
             return;
         }
         if (hash.length !== 60) {
-            nextTick(callback.bind(this, null, false));
+            utils.nextTick(callback.bind(this, null, false));
             return;
         }
-        bcrypt.hash(s, hash.substr(0, 29), function(err, comp) {
+        self.hash(s, hash.substr(0, 29), function(err, comp) {
             if (err)
                 callback(err);
             else
@@ -267,7 +274,7 @@ bcrypt.compare = function(s, hash, callback, progressCallback) {
  * @returns {number} Number of rounds used
  * @throws {Error} If `hash` is not a string
  */
-bcrypt.getRounds = function(hash) {
+Bcrypt.prototype.getRounds = function(hash) {
     if (typeof hash !== "string")
         throw Error("Illegal arguments: "+(typeof hash));
     return parseInt(hash.split("$")[2], 10);
@@ -279,7 +286,7 @@ bcrypt.getRounds = function(hash) {
  * @returns {string} Extracted salt part
  * @throws {Error} If `hash` is not a string or otherwise invalid
  */
-bcrypt.getSalt = function(hash) {
+Bcrypt.prototype.getSalt = function(hash) {
     if (typeof hash !== 'string')
         throw Error("Illegal arguments: "+(typeof hash));
     if (hash.length !== 60)
@@ -298,7 +305,7 @@ bcrypt.getSalt = function(hash) {
  * @param {number} len Maximum input length
  * @returns {string}
  */
-bcrypt.encodeBase64 = base64_encode;
+Bcrypt.prototype.encodeBase64 = base64Utils.encode;
 
 /**
  * Decodes a base64 encoded string to up to len bytes of output, using the custom bcrypt alphabet.
@@ -307,4 +314,6 @@ bcrypt.encodeBase64 = base64_encode;
  * @param {number} len Maximum output length
  * @returns {!Array.<number>}
  */
-bcrypt.decodeBase64 = base64_decode;
+Bcrypt.prototype.decodeBase64 = base64Utils.decode;
+
+module.exports = new Bcrypt();
