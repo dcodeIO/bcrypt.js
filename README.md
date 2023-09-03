@@ -31,7 +31,7 @@ secure random numbers.
 `npm install bcryptjs`
 
 ```js
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 ...
 ```
 
@@ -42,7 +42,7 @@ interface to obtain secure random numbers. If no cryptographically secure source
 specify one through [bcrypt.setRandomFallback](https://github.com/dcodeIO/bcrypt.js#setrandomfallbackrandom).
 
 ```js
-var bcrypt = dcodeIO.bcrypt;
+const bcrypt = dcodeIO.bcrypt;
 ...
 ```
 
