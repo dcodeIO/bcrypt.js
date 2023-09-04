@@ -31,7 +31,7 @@ secure random numbers.
 `npm install bcryptjs`
 
 ```js
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 ...
 ```
 
@@ -42,7 +42,7 @@ interface to obtain secure random numbers. If no cryptographically secure source
 specify one through [bcrypt.setRandomFallback](https://github.com/dcodeIO/bcrypt.js#setrandomfallbackrandom).
 
 ```js
-var bcrypt = dcodeIO.bcrypt;
+const bcrypt = dcodeIO.bcrypt;
 ...
 ```
 
@@ -59,12 +59,13 @@ require(["bcrypt"], function(bcrypt) {
 
 Usage - Sync
 ------------
-To hash a password: 
+
+To hash a password:
 
 ```javascript
-var bcrypt = require('bcryptjs');
-var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync("B4c0/\/", salt);
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
+const hash = bcrypt.hashSync("B4c0/\/", salt);
 // Store hash in your password DB.
 ```
 
@@ -79,7 +80,7 @@ bcrypt.compareSync("not_bacon", hash); // false
 Auto-gen a salt and hash:
 
 ```javascript
-var hash = bcrypt.hashSync('bacon', 8);
+const hash = bcrypt.hashSync('bacon', 8);
 ```
 
 Usage - Async
@@ -87,7 +88,7 @@ Usage - Async
 To hash a password: 
 
 ```javascript
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash("B4c0/\/", salt, function(err, hash) {
         // Store hash in your password DB.
