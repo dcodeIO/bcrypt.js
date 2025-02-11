@@ -1,6 +1,6 @@
 {
   "name": "bcryptjs",
-  "description": "Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to 'bcrypt'.",
+  "description": "Optimized bcrypt in plain JavaScript with zero dependencies, with TypeScript support. Compatible to 'bcrypt'.",
   "version": "0.0.0",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "contributors": [
