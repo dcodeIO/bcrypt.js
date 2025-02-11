@@ -63,6 +63,9 @@
     "LICENSE",
     "README.md"
   ],
+  "browser": {
+    "crypto": false
+  },
   "devDependencies": {
     "bcrypt": "^5.1.1",
     "esm2umd": "^0.2.2",

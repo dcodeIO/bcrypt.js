@@ -26,6 +26,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// The Node.js crypto module is used as a fallback for the Web Crypto API. When
+// building for the browser, inclusion of the crypto module should be disabled,
+// which the package hints at in its package.json for bundlers that support it.
+import nodeCrypto from "crypto";
+
 /**
  * The random implementation to use as a fallback.
  * @type {?function(number):!Array.<number>}
@@ -41,18 +46,16 @@ var randomFallback = null;
  * @throws {Error} If no random implementation is available
  * @inner
  */
-function random(len) {
-  // Web Crypto API
+function randomBytes(len) {
+  // Web Crypto API. Globally available in the browser and in Node.js >=23.
   try {
     return crypto.getRandomValues(new Uint8Array(len));
   } catch {}
-  // Node.js crypto
-  if (typeof require === "function") {
-    try {
-      return require("crypto").randomBytes(len);
-    } catch {}
-  }
-  // Fallback
+  // Node.js crypto module for non-browser environments.
+  try {
+    return nodeCrypto.randomBytes(len);
+  } catch {}
+  // Custom fallback specified with `setRandomFallback`.
   if (!randomFallback) {
     throw Error(
       "Neither WebCryptoAPI nor a crypto module is available. Use bcrypt.setRandomFallback to set an alternative",
@@ -97,7 +100,7 @@ export function genSaltSync(rounds, seed_length) {
   if (rounds < 10) salt.push("0");
   salt.push(rounds.toString());
   salt.push("$");
-  salt.push(base64_encode(random(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
+  salt.push(base64_encode(randomBytes(BCRYPT_SALT_LEN), BCRYPT_SALT_LEN)); // May throw
   return salt.join("");
 }
 
