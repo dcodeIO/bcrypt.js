@@ -1,5 +1,5 @@
 import bcrypt = require("../../umd/index.js");
 
-bcrypt.hashSync('test');
+bcrypt.hashSync("test");
 
 export = bcrypt;

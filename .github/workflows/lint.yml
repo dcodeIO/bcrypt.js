@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_version: ["current", "lts/*"]
+        node_version: ["current"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,7 +19,5 @@ jobs:
           node-version: ${{ matrix.node_version }}
       - name: Install dependencies
         run: npm ci --no-audit
-      - name: Build
-        run: npm run build
-      - name: Run tests
-        run: npm test
+      - name: Lint
+        run: npm run lint

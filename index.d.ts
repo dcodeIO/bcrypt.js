@@ -1,3 +1,3 @@
-import * as bcrypt from './types.js';
-export * from './types.js';
+import * as bcrypt from "./types.js";
+export * from "./types.js";
 export default bcrypt;

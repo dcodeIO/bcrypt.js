@@ -2,7 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "nodenext"
   },
   "include": ["./test-import.ts"]
 }

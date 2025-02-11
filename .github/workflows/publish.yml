@@ -7,27 +7,27 @@ jobs:
     if: github.repository == 'dcodeIO/bcrypt.js'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: main
-    - uses: actions/setup-node@v4
-      with:
-        node-version: current
-    - name: Install dependencies
-      run: npm ci
-    - name: Build
-      run: npm run build
-    - name: Run tests
-      run: npm test
-    - name: Publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      run: |
-        VERSION=$(npx aspublish --version)
-        if [ -z "$VERSION" ]; then
-          echo "Changes do not trigger a release"
-        else
-          echo "Publishing new version: $VERSION"
-          npx aspublish
-        fi
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: current
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: npm test
+      - name: Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(npx aspublish --version)
+          if [ -z "$VERSION" ]; then
+            echo "Changes do not trigger a release"
+          else
+            echo "Publishing new version: $VERSION"
+            npx aspublish
+          fi
