@@ -1,0 +1,25 @@
+name: Test
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: ["current", "lts_latest"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node_version }}
+    - name: Install dependencies
+      run: npm ci --no-audit
+    - name: Build
+      run: npm run build
+    - name: Run tests
+      run: npm test

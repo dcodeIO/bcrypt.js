@@ -1,7 +1,7 @@
 {
   "name": "bcryptjs",
   "description": "Optimized bcrypt in plain JavaScript with zero dependencies. Compatible to 'bcrypt'.",
-  "version": "2.4.4",
+  "version": "0.0.0",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "contributors": [
     "Shane Girish <shaneGirish@gmail.com> (https://github.com/shaneGirish)",
@@ -26,24 +26,44 @@
     "crypt",
     "crypto"
   ],
+  "type": "module",
+  "main": "umd/index.js",
+  "types": "umd/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./umd/index.d.ts",
+        "default": "./umd/index.js"
+      }
+    }
+  },
   "bin": {
     "bcrypt": "bin/bcrypt"
   },
-  "main": "index.js",
-  "browser": "dist/bcrypt.js",
-  "dependencies": {},
-  "devDependencies": {
-    "bcrypt": "latest",
-    "closurecompiler": "~1",
-    "metascript": "~1.0.0",
-    "testjs": "~1"
-  },
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "scripts": {
-    "test": "node node_modules/testjs/bin/testjs",
-    "build": "node scripts/build.js",
-    "compile": "node node_modules/closurecompiler/bin/ccjs dist/bcrypt.js --compilation_level=SIMPLE_OPTIMIZATIONS --create_source_map=dist/bcrypt.min.map > dist/bcrypt.min.js",
-    "compress": "gzip -c -9 dist/bcrypt.min.js > dist/bcrypt.min.js.gz",
-    "make": "npm run build && npm run compile && npm run compress && npm test"
+    "build": "esm2umd bcrypt index.js > umd/index.js",
+    "test": "npm run test:unit && npm run test:typescript",
+    "test:unit": "node tests",
+    "test:typescript": "tsc --project tests/typescript/tsconfig.esnext.json && tsc --project tests/typescript/tsconfig.nodenext.json && tsc --project tests/typescript/tsconfig.commonjs.json"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "umd/index.js",
+    "umd/index.d.ts",
+    "umd/package.json",
+    "types.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "bcrypt": "^5.1.1",
+    "esm2umd": "^0.2.2",
+    "typescript": "^5.7.3"
   }
 }

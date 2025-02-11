@@ -1,7 +1,8 @@
-var bcrypt = require("bcrypt"),
-    bcryptjs = require("../index.js"),
-    pass = "ä☺𠜎️☁",
-    testRounds = [8, 9, 10, 11, 12, 13, 14, 15];
+import bcrypt from "bcrypt";
+import bcryptjs from "../index.js";
+
+const pass = "ä☺𠜎️☁";
+const testRounds = [8, 9, 10, 11, 12, 13, 14, 15];
 
 function testSync(name, salt, impl) {
     var res;
