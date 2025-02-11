@@ -1047,7 +1047,7 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
  * @param {string} s String to hash
  * @param {?string} salt Salt to use, actually never null
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash. If omitted,
- *  hashing is perormed synchronously.
+ *  hashing is performed synchronously.
  *  @param {function(number)=} progressCallback Callback called with the current progress
  * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
  * @inner
