@@ -4,7 +4,7 @@ bcrypt.js
 Optimized bcrypt in JavaScript with zero dependencies, with TypeScript support. Compatible to the C++
 [bcrypt](https://npmjs.org/package/bcrypt) binding on Node.js and also working in the browser.
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/dcodeIO/bcrypt.js/test.yml?branch=master&label=test&logo=github)](https://github.com/dcodeIO/bcrypt.js/actions/workflows/test.yml) [![Publish Status](https://img.shields.io/github/actions/workflow/status/dcodeIO/bcrypt.js/publish.yml?branch=master&label=publish&logo=github)](https://github.com/dcodeIO/bcrypt.js/actions/workflows/publish.yml) [![npm](https://img.shields.io/npm/v/bcryptjs.svg?label=npm&color=007acc&logo=npm)](https://www.npmjs.com/package/bcryptjs)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/dcodeIO/bcrypt.js/test.yml?branch=main&label=test&logo=github)](https://github.com/dcodeIO/bcrypt.js/actions/workflows/test.yml) [![Publish Status](https://img.shields.io/github/actions/workflow/status/dcodeIO/bcrypt.js/publish.yml?branch=main&label=publish&logo=github)](https://github.com/dcodeIO/bcrypt.js/actions/workflows/publish.yml) [![npm](https://img.shields.io/npm/v/bcryptjs.svg?label=npm&color=007acc&logo=npm)](https://www.npmjs.com/package/bcryptjs)
 
 Security considerations
 -----------------------
