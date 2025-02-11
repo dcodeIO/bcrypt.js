@@ -91,7 +91,7 @@ export function genSaltSync(rounds, seed_length) {
     else if (rounds > 31)
         rounds = 31;
     var salt = [];
-    salt.push("$2a$");
+    salt.push("$2b$");
     if (rounds < 10)
         salt.push("0");
     salt.push(rounds.toString());
@@ -228,7 +228,7 @@ export function compareSync(s, hash) {
         throw Error("Illegal arguments: "+(typeof s)+', '+(typeof hash));
     if (hash.length !== 60)
         return false;
-    return safeStringCompare(hashSync(s, hash.substr(0, hash.length-31)), hash);
+    return safeStringCompare(hashSync(s, hash.substring(0, hash.length-31)), hash);
 }
 
 /**

@@ -51,13 +51,13 @@ const tests = [
     },
     function compareSync(done) {
         var salt1 = bcrypt.genSaltSync(),
-            hash1 = bcrypt.hashSync("hello", salt1); // $2a$
-        var salt2 = bcrypt.genSaltSync().replace(/\$2a\$/, "$2y$"),
+            hash1 = bcrypt.hashSync("hello", salt1); // $2b$
+        var salt2 = bcrypt.genSaltSync().replace(/\$2b\$/, "$2y$"),
             hash2 = bcrypt.hashSync("world", salt2);
-        var salt3 = bcrypt.genSaltSync().replace(/\$2a\$/, "$2b$"),
+        var salt3 = bcrypt.genSaltSync().replace(/\$2b\$/, "$2a$"),
             hash3 = bcrypt.hashSync("hello world", salt3);
 
-        assert.strictEqual(hash1.substring(0,4), "$2a$");
+        assert.strictEqual(hash1.substring(0,4), "$2b$");
         assert(bcrypt.compareSync("hello", hash1));
         assert(!bcrypt.compareSync("hello", hash2));
         assert(!bcrypt.compareSync("hello", hash3));
@@ -67,7 +67,7 @@ const tests = [
         assert(!bcrypt.compareSync("world", hash1));
         assert(!bcrypt.compareSync("world", hash3));
 
-        assert.strictEqual(hash3.substring(0,4), "$2b$");
+        assert.strictEqual(hash3.substring(0,4), "$2a$");
         assert(bcrypt.compareSync("hello world", hash3));
         assert(!bcrypt.compareSync("hello world", hash1));
         assert(!bcrypt.compareSync("hello world", hash2));
@@ -160,24 +160,24 @@ const tests = [
         assert.equal(hash1, hash2);
         done();
     },
-    // function compat_roundsOOB(done) {
-    //     var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
-    //         salt2 = binding.genSaltSync(0);
-    //     assert.strictEqual(salt1.substring(0, 7), "$2a$10$");
-    //     assert.strictEqual(salt2.substring(0, 7), "$2a$10$");
+    function compat_roundsOOB(done) {
+        var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
+            salt2 = binding.genSaltSync(0);
+        assert.strictEqual(salt1.substring(0, 7), "$2b$10$");
+        assert.strictEqual(salt2.substring(0, 7), "$2b$10$");
 
-    //     salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
-    //     salt2 = bcrypt.genSaltSync(3);
-    //     assert.strictEqual(salt1.substring(0, 7), "$2a$04$");
-    //     assert.strictEqual(salt2.substring(0, 7), "$2a$04$");
+        salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
+        salt2 = bcrypt.genSaltSync(3);
+        assert.strictEqual(salt1.substring(0, 7), "$2b$04$");
+        assert.strictEqual(salt2.substring(0, 7), "$2b$04$");
 
-    //     salt1 = bcrypt.genSaltSync(32); // $31$ is upper cap
-    //     salt2 = bcrypt.genSaltSync(32);
-    //     assert.strictEqual(salt1.substring(0, 7), "$2a$31$");
-    //     assert.strictEqual(salt2.substring(0, 7), "$2a$31$");
+        salt1 = bcrypt.genSaltSync(32); // $31$ is upper cap
+        salt2 = bcrypt.genSaltSync(32);
+        assert.strictEqual(salt1.substring(0, 7), "$2b$31$");
+        assert.strictEqual(salt2.substring(0, 7), "$2b$31$");
 
-    //     done();
-    // }
+        done();
+    }
 ]
 
 function next() {
