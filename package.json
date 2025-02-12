@@ -51,7 +51,7 @@
     "format": "prettier --write .",
     "test": "npm run test:unit && npm run test:typescript",
     "test:unit": "node tests",
-    "test:typescript": "tsc --project tests/typescript/tsconfig.esnext.json && tsc --project tests/typescript/tsconfig.nodenext.json && tsc --project tests/typescript/tsconfig.commonjs.json"
+    "test:typescript": "tsc --project tests/typescript/tsconfig.esnext.json && tsc --project tests/typescript/tsconfig.nodenext.json && tsc --project tests/typescript/tsconfig.commonjs.json && tsc --project tests/typescript/tsconfig.global.json"
   },
   "files": [
     "index.js",
@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "bcrypt": "^5.1.1",
-    "esm2umd": "^0.2.2",
+    "esm2umd": "^0.3.0",
     "prettier": "^3.5.0",
     "typescript": "^5.7.3"
   }
