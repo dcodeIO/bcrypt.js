@@ -1,12 +1,6 @@
-import path from "node:path";
-import fs from "node:fs";
 import assert from "node:assert";
-import { fileURLToPath } from "node:url";
-
-import binding from "bcrypt";
+import bcryptcpp from "bcrypt";
 import bcrypt from "../index.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const tests = [
   function encodeBase64(done) {
@@ -177,27 +171,45 @@ const tests = [
       },
     );
   },
-  function compat_quickbrown(done) {
-    var pass = fs.readFileSync(path.join(__dirname, "quickbrown.txt")) + "",
-      salt = bcrypt.genSaltSync(),
-      hash1 = binding.hashSync(pass, salt),
-      hash2 = bcrypt.hashSync(pass, salt);
-    assert.equal(hash1, hash2);
+  function compat_hash(done) {
+    var pass = [
+      " space ",
+      "Heizölrückstoßabdämpfung",
+      "Ξεσκεπάζω τὴν ψυχοφθόρα βδελυγμία",
+      "El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y ",
+      "Où l'obèse jury mûr",
+      "Úrmhac na hÓighe Beannaithe",
+      "Árvíztűrő tükörfúrógép",
+      "Sævör grét áðan því úlpan var ónýt",
+      "わかよたれそつねならむ",
+      "ケフコエテ アサキユメミシ",
+      "דג סקרן שט בים מאוכזב ולפתע מצא לו חברה איך הקליטה",
+      "Pchnąć w tę łódź jeża lub ośm skrzyń fig",
+      "В чащах юга жил бы цитрус? Да, но фальшивый экземпляр!",
+      "๏ เป็นมนุษย์สุดประเสริฐเลิศคุณค่า",
+      "Pijamalı hasta, yağız şoföre çabucak güvendi.",
+    ];
+    for (var i = 0; i < pass.length; i++) {
+      var salt = bcrypt.genSaltSync(),
+        hash1 = bcryptcpp.hashSync(pass[i], salt),
+        hash2 = bcrypt.hashSync(pass[i], salt);
+      assert.equal(hash1, hash2);
+    }
     done();
   },
   function compat_roundsOOB(done) {
     var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
-      salt2 = binding.genSaltSync(0);
+      salt2 = bcryptcpp.genSaltSync(0);
     assert.strictEqual(salt1.substring(0, 7), "$2b$10$");
     assert.strictEqual(salt2.substring(0, 7), "$2b$10$");
 
     salt1 = bcrypt.genSaltSync(3); // $04$ is lower cap
-    salt2 = bcrypt.genSaltSync(3);
+    salt2 = bcryptcpp.genSaltSync(3);
     assert.strictEqual(salt1.substring(0, 7), "$2b$04$");
     assert.strictEqual(salt2.substring(0, 7), "$2b$04$");
 
     salt1 = bcrypt.genSaltSync(32); // $31$ is upper cap
-    salt2 = bcrypt.genSaltSync(32);
+    salt2 = bcryptcpp.genSaltSync(32);
     assert.strictEqual(salt1.substring(0, 7), "$2b$31$");
     assert.strictEqual(salt2.substring(0, 7), "$2b$31$");
 
