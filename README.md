@@ -42,6 +42,8 @@ import bcrypt from "bcryptjs";
 
 Replace `TAG` respectively `VERSION` with a [specific version](https://github.com/dcodeIO/bcrypt.js/releases) or omit it (not recommended in production) to use latest.
 
+When using the ESM variant in a browser, the `crypto` import needs to be stubbed out, for example using an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). Bundlers should omit it automatically.
+
 ### Usage - Sync
 
 To hash a password:
