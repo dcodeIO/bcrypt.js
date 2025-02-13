@@ -127,42 +127,53 @@ Usage: bcrypt <input> [rounds|salt]
 
 ### Callback types
 
-- type **Callback<`T`>**: `(err: Error | null, result?: T) => void`
+- **Callback<`T`>**: `(err: Error | null, result?: T) => void`<br />
+  Called with an error on failure or a value of type `T` upon success.
 
-- type **ProgressCallback**: `(percentage: number) => void`
+- **ProgressCallback**: `(percentage: number) => void`<br />
+  Called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+
+- **RandomFallback**: `(length: number) => number[]`<br />
+  Called to obtain random bytes when both [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI/) and Node.js
+  [crypto](http://nodejs.org/api/crypto.html) are not available.
 
 ### Functions
-
-- bcrypt.**setRandomFallback**(random: `(length: number) => number[]`): `void`<br />
-  Sets the pseudo random number generator to use as a fallback if neither Node's [crypto](http://nodejs.org/api/crypto.html) module nor the [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI/) is available. Please note: It is highly important that the PRNG used is cryptographically secure and that it is seeded properly!
 
 - bcrypt.**genSaltSync**(rounds?: `number`): `string`<br />
   Synchronously generates a salt. Number of rounds defaults to 10 when omitted.
 
 - bcrypt.**genSalt**(rounds?: `number`): `Promise<string>`<br />
-  bcrypt.**genSalt**(rounds: `number`, callback: `Callback<string>`): `void`<br />
-  bcrypt.**genSalt**(callback: `Callback<string>`): `void`<br />
+  Asynchronously generates a salt. Number of rounds defaults to 10 when omitted.
+
+- bcrypt.**genSalt**([rounds: `number`, ]callback: `Callback<string>`): `void`<br />
   Asynchronously generates a salt. Number of rounds defaults to 10 when omitted.
 
 - bcrypt.**hashSync**(s: `string`, salt?: `number | string`): `string`
   Synchronously generates a hash for the given string. Number of rounds defaults to 10 when omitted.
 
 - bcrypt.**hash**(s: `string`, salt: `number | string`): `Promise<string>`<br />
-  bcrypt.**hash**(s: `string`, salt: `number | string`, callback: `Callback<string>`, progressCallback?: `ProgressCallback`): `void`<br />
-  Asynchronously generates a hash for the given string. Optionally calls a progress callback with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+  Asynchronously generates a hash for the given string.
+
+- bcrypt.**hash**(s: `string`, salt: `number | string`, callback: `Callback<string>`, progressCallback?: `ProgressCallback`): `void`<br />
+  Asynchronously generates a hash for the given string.
 
 - bcrypt.**compareSync**(s: `string`, hash: `string`): `boolean`<br />
   Synchronously tests a string against a hash.
 
 - bcrypt.**compare**(s: `string`, hash: `string`): `Promise<boolean>`<br />
-  bcrypt.**compare**(s: `string`, hash: `string`, callback: `Callback<boolean>`, progressCallback?: `ProgressCallback`)<br />
-  Asynchronously compares a string against a hash. Optionally calls a progress callback with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
+  Asynchronously compares a string against a hash.
+
+- bcrypt.**compare**(s: `string`, hash: `string`, callback: `Callback<boolean>`, progressCallback?: `ProgressCallback`)<br />
+  Asynchronously compares a string against a hash.
 
 - bcrypt.**getRounds**(hash: `string`): `number`<br />
   Gets the number of rounds used to encrypt the specified hash.
 
 - bcrypt.**getSalt**(hash: `string`): `string`<br />
   Gets the salt portion from a hash. Does not validate the hash.
+
+- bcrypt.**setRandomFallback**(random: `RandomFallback`): `void`<br />
+  Sets the pseudo random number generator to use as a fallback if neither [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI/) nor Node.js [crypto](http://nodejs.org/api/crypto.html) are available. Please note: It is highly important that the PRNG used is cryptographically secure and that it is seeded properly!
 
 ## Building
 

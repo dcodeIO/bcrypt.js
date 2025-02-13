@@ -1,37 +1,19 @@
-// imported from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/bcryptjs/index.d.ts
+// Originally imported from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/8b36dbdf95b624b8a7cd7f8416f06c15d274f9e6/types/bcryptjs/index.d.ts
+// MIT license.
 
-/*
-MIT License
-
-Copyright (c) Microsoft Corporation.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE
-*/
+/** Called with an error on failure or a value of type `T` upon success. */
+type Callback<T> = (err: Error | null, result?: T) => void;
+/** Called with the percentage of rounds completed (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms. */
+type ProgressCallback = (percentage: number) => void;
+/** Called to obtain random bytes when both Web Crypto API and Node.js crypto are not available. */
+type RandomFallback = (length: number) => number[];
 
 /**
  * Sets the pseudo random number generator to use as a fallback if neither node's crypto module nor the Web Crypto API is available.
  * Please note: It is highly important that the PRNG used is cryptographically secure and that it is seeded properly!
  * @param  random Function taking the number of bytes to generate as its sole argument, returning the corresponding array of cryptographically secure random byte values.
  */
-export declare function setRandomFallback(
-  random: (random: number) => number[],
-): void;
+export declare function setRandomFallback(random: RandomFallback): void;
 
 /**
  * Synchronously generates a salt.
@@ -52,9 +34,7 @@ export declare function genSalt(rounds?: number): Promise<string>;
  * Asynchronously generates a salt.
  * @param callback Callback receiving the error, if any, and the resulting salt
  */
-export declare function genSalt(
-  callback: (err: Error | null, salt: string) => void,
-): void;
+export declare function genSalt(callback: Callback<string>): void;
 
 /**
  * Asynchronously generates a salt.
@@ -63,7 +43,7 @@ export declare function genSalt(
  */
 export declare function genSalt(
   rounds: number,
-  callback: (err: Error | null, salt: string) => void,
+  callback: Callback<string>,
 ): void;
 
 /**
@@ -92,8 +72,8 @@ export declare function hash(s: string, salt: number | string): Promise<string>;
 export declare function hash(
   s: string,
   salt: number | string,
-  callback?: (err: Error | null, hash: string) => void,
-  progressCallback?: (percent: number) => void,
+  callback?: Callback<string>,
+  progressCallback?: ProgressCallback,
 ): void;
 
 /**
@@ -122,8 +102,8 @@ export declare function compare(s: string, hash: string): Promise<boolean>;
 export declare function compare(
   s: string,
   hash: string,
-  callback?: (err: Error | null, success: boolean) => void,
-  progressCallback?: (percent: number) => void,
+  callback?: Callback<boolean>,
+  progressCallback?: ProgressCallback,
 ): void;
 
 /**
