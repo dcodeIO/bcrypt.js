@@ -47,60 +47,69 @@ export declare function genSalt(
 ): void;
 
 /**
- * Synchronously generates a hash for the given string.
- * @param  s    String to hash
+ * Synchronously generates a hash for the given password.
+ * @param  password Password to hash
  * @param  salt Salt length to generate or salt to use, default to 10
  * @return Resulting hash
  */
-export declare function hashSync(s: string, salt?: number | string): string;
+export declare function hashSync(
+  password: string,
+  salt?: number | string,
+): string;
 
 /**
- * Asynchronously generates a hash for the given string.
- * @param s                String to hash
- * @param salt             Salt length to generate or salt to use
+ * Asynchronously generates a hash for the given password.
+ * @param password Password to hash
+ * @param salt     Salt length to generate or salt to use
  * @return Promise with resulting hash, if callback has been omitted
  */
-export declare function hash(s: string, salt: number | string): Promise<string>;
+export declare function hash(
+  password: string,
+  salt: number | string,
+): Promise<string>;
 
 /**
- * Asynchronously generates a hash for the given string.
- * @param s                String to hash
+ * Asynchronously generates a hash for the given password.
+ * @param password         Password to hash
  * @param salt             Salt length to generate or salt to use
  * @param callback         Callback receiving the error, if any, and the resulting hash
  * @param progressCallback Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per MAX_EXECUTION_TIME = 100 ms.
  */
 export declare function hash(
-  s: string,
+  password: string,
   salt: number | string,
   callback?: Callback<string>,
   progressCallback?: ProgressCallback,
 ): void;
 
 /**
- * Synchronously tests a string against a hash.
- * @param  s    String to compare
- * @param  hash Hash to test against
+ * Synchronously tests a password against a hash.
+ * @param  password Password to test
+ * @param  hash     Hash to test against
  * @return true if matching, otherwise false
  */
-export declare function compareSync(s: string, hash: string): boolean;
+export declare function compareSync(password: string, hash: string): boolean;
 
 /**
- * Asynchronously compares the given data against the given hash.
- * @param  s                Data to compare
- * @param  hash             Data to be compared to
+ * Asynchronously tests a password against a hash.
+ * @param  password Password to test
+ * @param  hash     Hash to test against
  * @return Promise, if callback has been omitted
  */
-export declare function compare(s: string, hash: string): Promise<boolean>;
+export declare function compare(
+  password: string,
+  hash: string,
+): Promise<boolean>;
 
 /**
- * Asynchronously compares the given data against the given hash.
- * @param  s                Data to compare
- * @param  hash             Data to be compared to
+ * Asynchronously tests a password against a hash.
+ * @param  password         Password to test
+ * @param  hash             Hash to test against
  * @param  callback         Callback receiving the error, if any, otherwise the result
  * @param  progressCallback Callback successively called with the percentage of rounds completed (0.0 - 1.0), maximally once per MAX_EXECUTION_TIME = 100 ms.
  */
 export declare function compare(
-  s: string,
+  password: string,
   hash: string,
   callback?: Callback<boolean>,
   progressCallback?: ProgressCallback,
@@ -119,6 +128,14 @@ export declare function getRounds(hash: string): number;
  * @return Extracted salt part
  */
 export declare function getSalt(hash: string): string;
+
+/**
+ * Tests if a password will be truncated when hashed, that is its length is
+ * greater than 72 bytes when converted to UTF-8.
+ * @param password The password to test
+ * @returns `true` if truncated, otherwise `false`
+ */
+export declare function truncates(password: string): boolean;
 
 /**
  * Encodes a byte array to base64 with up to len bytes of input, using the custom bcrypt alphabet.

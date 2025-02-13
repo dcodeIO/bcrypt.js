@@ -116,6 +116,13 @@ const tests = [
     assert.equal(bcrypt.getRounds(hash1), 10);
     done();
   },
+  function truncates(done) {
+    assert(!bcrypt.truncates(""));
+    assert(!bcrypt.truncates("a".repeat(72)));
+    assert(bcrypt.truncates("a".repeat(73)));
+    assert(bcrypt.truncates("๏ เป็นมนุษย์สุดประเสริฐเลิศคุณค่า"));
+    done();
+  },
   function progress(done) {
     bcrypt.genSalt(12, function (err, salt) {
       assert(!err);
@@ -173,7 +180,11 @@ const tests = [
   },
   function compat_hash(done) {
     var pass = [
-      " space ",
+      "",
+      " ",
+      " a ",
+      "a".repeat(72),
+      "a".repeat(73),
       "Heizölrückstoßabdämpfung",
       "Ξεσκεπάζω τὴν ψυχοφθόρα βδελυγμία",
       "El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y ",
@@ -197,7 +208,7 @@ const tests = [
     }
     done();
   },
-  function compat_roundsOOB(done) {
+  function compat_rounds(done) {
     var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
       salt2 = bcryptcpp.genSaltSync(0);
     assert.strictEqual(salt1.substring(0, 7), "$2b$10$");

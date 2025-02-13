@@ -148,22 +148,22 @@ export function genSalt(rounds, seed_length, callback) {
 }
 
 /**
- * Synchronously generates a hash for the given string.
- * @param {string} s String to hash
+ * Synchronously generates a hash for the given password.
+ * @param {string} password Password to hash
  * @param {(number|string)=} salt Salt length to generate or salt to use, default to 10
  * @returns {string} Resulting hash
  */
-export function hashSync(s, salt) {
+export function hashSync(password, salt) {
   if (typeof salt === "undefined") salt = GENSALT_DEFAULT_LOG2_ROUNDS;
   if (typeof salt === "number") salt = genSaltSync(salt);
-  if (typeof s !== "string" || typeof salt !== "string")
-    throw Error("Illegal arguments: " + typeof s + ", " + typeof salt);
-  return _hash(s, salt);
+  if (typeof password !== "string" || typeof salt !== "string")
+    throw Error("Illegal arguments: " + typeof password + ", " + typeof salt);
+  return _hash(password, salt);
 }
 
 /**
- * Asynchronously generates a hash for the given string.
- * @param {string} s String to hash
+ * Asynchronously generates a hash for the given password.
+ * @param {string} password Password to hash
  * @param {number|string} salt Salt length to generate or salt to use
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
@@ -171,19 +171,19 @@ export function hashSync(s, salt) {
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
  */
-export function hash(s, salt, callback, progressCallback) {
+export function hash(password, salt, callback, progressCallback) {
   function _async(callback) {
-    if (typeof s === "string" && typeof salt === "number")
+    if (typeof password === "string" && typeof salt === "number")
       genSalt(salt, function (err, salt) {
-        _hash(s, salt, callback, progressCallback);
+        _hash(password, salt, callback, progressCallback);
       });
-    else if (typeof s === "string" && typeof salt === "string")
-      _hash(s, salt, callback, progressCallback);
+    else if (typeof password === "string" && typeof salt === "string")
+      _hash(password, salt, callback, progressCallback);
     else
       nextTick(
         callback.bind(
           this,
-          Error("Illegal arguments: " + typeof s + ", " + typeof salt),
+          Error("Illegal arguments: " + typeof password + ", " + typeof salt),
         ),
       );
   }
@@ -220,39 +220,41 @@ function safeStringCompare(known, unknown) {
 }
 
 /**
- * Synchronously tests a string against a hash.
- * @param {string} s String to compare
+ * Synchronously tests a password against a hash.
+ * @param {string} password Password to compare
  * @param {string} hash Hash to test against
  * @returns {boolean} true if matching, otherwise false
  * @throws {Error} If an argument is illegal
  */
-export function compareSync(s, hash) {
-  if (typeof s !== "string" || typeof hash !== "string")
-    throw Error("Illegal arguments: " + typeof s + ", " + typeof hash);
+export function compareSync(password, hash) {
+  if (typeof password !== "string" || typeof hash !== "string")
+    throw Error("Illegal arguments: " + typeof password + ", " + typeof hash);
   if (hash.length !== 60) return false;
   return safeStringCompare(
-    hashSync(s, hash.substring(0, hash.length - 31)),
+    hashSync(password, hash.substring(0, hash.length - 31)),
     hash,
   );
 }
 
 /**
- * Asynchronously compares the given data against the given hash.
- * @param {string} s Data to compare
- * @param {string} hashValue Data to be compared to
+ * Asynchronously tests a password against a hash.
+ * @param {string} password Password to compare
+ * @param {string} hashValue Hash to test against
  * @param {function(Error, boolean)=} callback Callback receiving the error, if any, otherwise the result
  * @param {function(number)=} progressCallback Callback successively called with the percentage of rounds completed
  *  (0.0 - 1.0), maximally once per `MAX_EXECUTION_TIME = 100` ms.
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
  */
-export function compare(s, hashValue, callback, progressCallback) {
+export function compare(password, hashValue, callback, progressCallback) {
   function _async(callback) {
-    if (typeof s !== "string" || typeof hashValue !== "string") {
+    if (typeof password !== "string" || typeof hashValue !== "string") {
       nextTick(
         callback.bind(
           this,
-          Error("Illegal arguments: " + typeof s + ", " + typeof hashValue),
+          Error(
+            "Illegal arguments: " + typeof password + ", " + typeof hashValue,
+          ),
         ),
       );
       return;
@@ -262,7 +264,7 @@ export function compare(s, hashValue, callback, progressCallback) {
       return;
     }
     hash(
-      s,
+      password,
       hashValue.substring(0, 29),
       function (err, comp) {
         if (err) callback(err);
@@ -312,6 +314,18 @@ export function getSalt(hash) {
   if (hash.length !== 60)
     throw Error("Illegal hash length: " + hash.length + " != 60");
   return hash.substring(0, 29);
+}
+
+/**
+ * Tests if a password will be truncated when hashed, that is its length is
+ * greater than 72 bytes when converted to UTF-8.
+ * @param {string} password The password to test
+ * @returns {boolean} `true` if truncated, otherwise `false`
+ */
+export function truncates(password) {
+  if (typeof password !== "string")
+    throw Error("Illegal arguments: " + typeof password);
+  return utf8Length(password) > 72;
 }
 
 /**
@@ -960,7 +974,7 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
     j;
 
   //Use typed arrays when available - huge speedup!
-  if (Int32Array) {
+  if (typeof Int32Array === "function") {
     P = new Int32Array(P_ORIG);
     S = new Int32Array(S_ORIG);
   } else {
@@ -1014,8 +1028,8 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
 }
 
 /**
- * Internally hashes a string.
- * @param {string} s String to hash
+ * Internally hashes a password.
+ * @param {string} password Password to hash
  * @param {?string} salt Salt to use, actually never null
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting hash. If omitted,
  *  hashing is performed synchronously.
@@ -1023,9 +1037,9 @@ function _crypt(b, salt, rounds, callback, progressCallback) {
  * @returns {string|undefined} Resulting hash if callback has been omitted, otherwise `undefined`
  * @inner
  */
-function _hash(s, salt, callback, progressCallback) {
+function _hash(password, salt, callback, progressCallback) {
   var err;
-  if (typeof s !== "string" || typeof salt !== "string") {
+  if (typeof password !== "string" || typeof salt !== "string") {
     err = Error("Invalid string / salt: Not a string");
     if (callback) {
       nextTick(callback.bind(this, err));
@@ -1070,9 +1084,9 @@ function _hash(s, salt, callback, progressCallback) {
     r2 = parseInt(salt.substring(offset + 1, offset + 2), 10),
     rounds = r1 + r2,
     real_salt = salt.substring(offset + 3, offset + 25);
-  s += minor >= "a" ? "\x00" : "";
+  password += minor >= "a" ? "\x00" : "";
 
-  var passwordb = utf8Array(s),
+  var passwordb = utf8Array(password),
     saltb = base64_decode(real_salt, BCRYPT_SALT_LEN);
 
   /**
@@ -1115,23 +1129,23 @@ function _hash(s, salt, callback, progressCallback) {
 /**
  * Encodes a byte array to base64 with up to len bytes of input, using the custom bcrypt alphabet.
  * @function
- * @param {!Array.<number>} b Byte array
- * @param {number} len Maximum input length
+ * @param {!Array.<number>} bytes Byte array
+ * @param {number} length Maximum input length
  * @returns {string}
  */
-export function encodeBase64(b, len) {
-  return base64_encode(b, len);
+export function encodeBase64(bytes, length) {
+  return base64_encode(bytes, length);
 }
 
 /**
  * Decodes a base64 encoded string to up to len bytes of output, using the custom bcrypt alphabet.
  * @function
- * @param {string} s String to decode
- * @param {number} len Maximum output length
+ * @param {string} string String to decode
+ * @param {number} length Maximum output length
  * @returns {!Array.<number>}
  */
-export function decodeBase64(s, len) {
-  return base64_decode(s, len);
+export function decodeBase64(string, length) {
+  return base64_decode(string, length);
 }
 
 export default {
@@ -1144,6 +1158,7 @@ export default {
   compare,
   getRounds,
   getSalt,
+  truncates,
   encodeBase64,
   decodeBase64,
 };

@@ -14,8 +14,9 @@ increasing computation power. ([see](http://en.wikipedia.org/wiki/Bcrypt))
 While bcrypt.js is compatible to the C++ bcrypt binding, it is written in pure JavaScript and thus slower ([about 30%](https://github.com/dcodeIO/bcrypt.js/wiki/Benchmark)), effectively reducing the number of iterations that can be
 processed in an equal time span.
 
-The maximum input length is 72 bytes (note that UTF8 encoded characters use up to 4 bytes) and the length of generated
-hashes is 60 characters.
+The maximum input length is 72 bytes (note that UTF-8 encoded characters use up to 4 bytes) and the length of generated
+hashes is 60 characters. Note that maximum input length is not implicitly checked by the library for compatibility with
+the C++ binding on Node.js, but should be checked with `bcrypt.truncates(password)` where necessary.
 
 ## Usage
 
@@ -150,23 +151,26 @@ Usage: bcrypt <input> [rounds|salt]
 - bcrypt.**genSalt**([rounds: `number`, ]callback: `Callback<string>`): `void`<br />
   Asynchronously generates a salt. Number of rounds defaults to 10 when omitted.
 
-- bcrypt.**hashSync**(s: `string`, salt?: `number | string`): `string`
-  Synchronously generates a hash for the given string. Number of rounds defaults to 10 when omitted.
+- bcrypt.**truncates**(password: `string`): `boolean`<br />
+  Tests if a password will be truncated when hashed, that is its length is greater than 72 bytes when converted to UTF-8.
 
-- bcrypt.**hash**(s: `string`, salt: `number | string`): `Promise<string>`<br />
-  Asynchronously generates a hash for the given string.
+- bcrypt.**hashSync**(password: `string`, salt?: `number | string`): `string`
+  Synchronously generates a hash for the given password. Number of rounds defaults to 10 when omitted.
 
-- bcrypt.**hash**(s: `string`, salt: `number | string`, callback: `Callback<string>`, progressCallback?: `ProgressCallback`): `void`<br />
-  Asynchronously generates a hash for the given string.
+- bcrypt.**hash**(password: `string`, salt: `number | string`): `Promise<string>`<br />
+  Asynchronously generates a hash for the given password.
 
-- bcrypt.**compareSync**(s: `string`, hash: `string`): `boolean`<br />
-  Synchronously tests a string against a hash.
+- bcrypt.**hash**(password: `string`, salt: `number | string`, callback: `Callback<string>`, progressCallback?: `ProgressCallback`): `void`<br />
+  Asynchronously generates a hash for the given password.
 
-- bcrypt.**compare**(s: `string`, hash: `string`): `Promise<boolean>`<br />
-  Asynchronously compares a string against a hash.
+- bcrypt.**compareSync**(password: `string`, hash: `string`): `boolean`<br />
+  Synchronously tests a password against a hash.
 
-- bcrypt.**compare**(s: `string`, hash: `string`, callback: `Callback<boolean>`, progressCallback?: `ProgressCallback`)<br />
-  Asynchronously compares a string against a hash.
+- bcrypt.**compare**(password: `string`, hash: `string`): `Promise<boolean>`<br />
+  Asynchronously compares a password against a hash.
+
+- bcrypt.**compare**(password: `string`, hash: `string`, callback: `Callback<boolean>`, progressCallback?: `ProgressCallback`)<br />
+  Asynchronously compares a password against a hash.
 
 - bcrypt.**getRounds**(hash: `string`): `number`<br />
   Gets the number of rounds used to encrypt the specified hash.
