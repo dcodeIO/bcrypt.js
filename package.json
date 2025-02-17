@@ -46,7 +46,7 @@
   },
   "license": "BSD-3-Clause",
   "scripts": {
-    "build": "esm2umd bcrypt index.js > umd/index.js && prettier --write umd/index.js",
+    "build": "node scripts/build.js",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "test": "npm run test:unit && npm run test:typescript",
@@ -56,10 +56,11 @@
   "files": [
     "index.js",
     "index.d.ts",
+    "types.d.ts",
     "umd/index.js",
     "umd/index.d.ts",
+    "umd/types.d.ts",
     "umd/package.json",
-    "types.d.ts",
     "LICENSE",
     "README.md"
   ],

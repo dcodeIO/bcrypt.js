@@ -1,3 +1,4 @@
 node_modules/
 npm-debug.*
 umd/index.js
+umd/types.d.ts
