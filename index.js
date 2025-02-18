@@ -64,9 +64,6 @@ function randomBytes(len) {
   return randomFallback(len);
 }
 
-// Default fallback, if any
-randomFallback = null;
-
 /**
  * Sets the pseudo random number generator to use as a fallback if neither node's `crypto` module nor the Web Crypto
  *  API is available. Please note: It is highly important that the PRNG used is cryptographically secure and that it

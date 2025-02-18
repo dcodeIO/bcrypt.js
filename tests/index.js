@@ -1,6 +1,9 @@
 import assert from "node:assert";
+import { createRequire } from "node:module";
 import bcryptcpp from "bcrypt";
 import bcrypt from "../index.js";
+
+const require = createRequire(import.meta.url);
 
 const tests = [
   function encodeBase64(done) {
@@ -225,6 +228,10 @@ const tests = [
     assert.strictEqual(salt2.substring(0, 7), "$2b$31$");
 
     done();
+  },
+  function commonJS(done) {
+    var umd = require("../umd/index.js");
+    umd.genSalt().then(done);
   },
 ];
 
