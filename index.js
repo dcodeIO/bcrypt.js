@@ -490,6 +490,7 @@ function base64_decode(s, len) {
     if (++olen >= len || off >= slen) break;
     code = s.charCodeAt(off++);
     c4 = code < BASE64_INDEX.length ? BASE64_INDEX[code] : -1;
+    if (c4 == -1) break;
     o = ((c3 & 0x03) << 6) >>> 0;
     o |= c4;
     rs.push(String.fromCharCode(o));
