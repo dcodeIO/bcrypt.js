@@ -380,6 +380,13 @@ function utf8Array(string) {
       buffer[offset++] = ((c1 >> 12) & 63) | 128;
       buffer[offset++] = ((c1 >> 6) & 63) | 128;
       buffer[offset++] = (c1 & 63) | 128;
+    } else if ((c1 & 0xf800) === 0xd800) {
+      // Lone surrogate (not part of a valid pair, handled above). Emit the
+      // U+FFFD replacement character to match Buffer.from(str, "utf8") and the
+      // native bcrypt binding, rather than WTF-8 encoding the raw code unit.
+      buffer[offset++] = 0xef;
+      buffer[offset++] = 0xbf;
+      buffer[offset++] = 0xbd;
     } else {
       buffer[offset++] = (c1 >> 12) | 224;
       buffer[offset++] = ((c1 >> 6) & 63) | 128;
