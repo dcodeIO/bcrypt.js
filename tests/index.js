@@ -211,6 +211,25 @@ const tests = [
     }
     done();
   },
+  function compat_lone_surrogate(done) {
+    // Passwords containing an unpaired UTF-16 surrogate must hash identically
+    // to the native C++ binding, which encodes a lone surrogate the same way
+    // as Buffer.from(str, "utf8"): as U+FFFD (EF BF BD), not WTF-8 (ED A0 80).
+    var salt = "$2b$06$DCq7YPn5Rq63x1Lad4cll.";
+    var pass = [
+      "\uD800", // high surrogate, alone
+      "\uDC00", // low surrogate, alone
+      "\uD83D", // high surrogate of an emoji, without its low half
+      "a\uD800b", // lone surrogate surrounded by ASCII
+      "\uDC00\uD800", // low then high: still two lone surrogates
+    ];
+    for (var i = 0; i < pass.length; i++) {
+      var hash1 = bcryptcpp.hashSync(pass[i], salt),
+        hash2 = bcrypt.hashSync(pass[i], salt);
+      assert.equal(hash1, hash2);
+    }
+    done();
+  },
   function compat_rounds(done) {
     var salt1 = bcrypt.genSaltSync(0), // $10$ like not set
       salt2 = bcryptcpp.genSaltSync(0);
