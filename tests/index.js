@@ -35,6 +35,20 @@ const tests = [
     assert(salt.length > 0);
     done();
   },
+  function genSaltSyncIntegerRounds(done) {
+    var salt = bcrypt.genSaltSync(10);
+    assert.strictEqual(salt.substring(0, 7), "$2b$10$");
+    assert.doesNotThrow(function () {
+      bcrypt.hashSync("hello", salt);
+    });
+    assert.throws(function () {
+      bcrypt.genSaltSync(10.5);
+    });
+    assert.throws(function () {
+      bcrypt.hashSync("hello", 10.5);
+    });
+    done();
+  },
   function genSalt(done) {
     bcrypt.genSalt(10, function (err, salt) {
       assert(!err);
