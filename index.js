@@ -90,6 +90,8 @@ export function genSaltSync(rounds, seed_length) {
     throw Error(
       "Illegal arguments: " + typeof rounds + ", " + typeof seed_length,
     );
+  if (!Number.isInteger(rounds))
+    throw Error("Illegal arguments: rounds must be an integer");
   if (rounds < 4) rounds = 4;
   else if (rounds > 31) rounds = 31;
   var salt = [];
