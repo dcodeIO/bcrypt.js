@@ -33,29 +33,111 @@ const tests = [
     assert(salt);
     assert(typeof salt === "string");
     assert(salt.length > 0);
+
+    // Negative test cases: non-integer rounds must throw
+    assert.throws(function () {
+      bcrypt.genSaltSync(10.5);
+    }, /Illegal arguments: rounds must be an integer/);
+    assert.throws(function () {
+      bcrypt.genSaltSync(Infinity);
+    }, /Illegal arguments: rounds must be an integer/);
+
+    // Positive test cases: valid integers and boundaries (4 to 31)
+    // Bcrypt salts follow the Modular Crypt Format (MCF): "$<algorithm-id>$<rounds>$<salt>"
+    // Splitting by "$" yields ["", "<algorithm-id>", "<rounds>", "<salt>"], so parts[2] is always the rounds.
+    [
+      { rounds: 4, expectedCost: "04" },
+      { rounds: 10, expectedCost: "10" },
+      { rounds: 10.0, expectedCost: "10" }, // 10.0 is represented identically to 10 in JS
+      { rounds: 31, expectedCost: "31" },
+    ].forEach(function (testCase) {
+      var s = bcrypt.genSaltSync(testCase.rounds);
+      var parts = s.split("$");
+      assert.strictEqual(parts[2], testCase.expectedCost);
+    });
     done();
   },
   function genSalt(done) {
-    bcrypt.genSalt(10, function (err, salt) {
-      assert(!err);
-      assert(salt);
-      assert(typeof salt === "string");
-      assert(salt.length > 0);
-      done();
-    });
+    // Non-integer rounds without a callback: returns a rejected promise
+    Promise.all([
+      assert.rejects(
+        bcrypt.genSalt(10.5),
+        /Illegal arguments: rounds must be an integer/,
+      ),
+      assert.rejects(
+        bcrypt.genSalt(Infinity),
+        /Illegal arguments: rounds must be an integer/,
+      ),
+    ])
+      .then(function () {
+        // Non-integer rounds with a callback: error is passed to callback
+        bcrypt.genSalt(10.5, function (err) {
+          assert(err);
+          assert(
+            /Illegal arguments: rounds must be an integer/.test(err.message),
+          );
+          bcrypt.genSalt(10, function (err, salt) {
+            assert(!err);
+            assert(salt);
+            assert(typeof salt === "string");
+            assert(salt.length > 0);
+            done();
+          });
+        });
+      })
+      .catch(function (err) {
+        assert.fail("genSalt rejection test failed: " + err.message);
+      });
   },
   function hashSync(done) {
     assert.doesNotThrow(function () {
       bcrypt.hashSync("hello", 10);
     });
     assert.notEqual(bcrypt.hashSync("hello", 10), bcrypt.hashSync("hello", 10));
+    assert.throws(function () {
+      bcrypt.hashSync("x", 10.5);
+    }, /Illegal arguments: rounds must be an integer/);
+    assert.throws(function () {
+      bcrypt.hashSync("x", Infinity);
+    }, /Illegal arguments: rounds must be an integer/);
     done();
   },
   function hash(done) {
     bcrypt.hash("hello", 10, function (err, hash) {
       assert(!err);
       assert(hash);
-      done();
+      Promise.all([
+        assert.rejects(
+          bcrypt.hash("x", 10.5),
+          /Illegal arguments: rounds must be an integer/,
+        ),
+        assert.rejects(
+          bcrypt.hash("x", Infinity),
+          /Illegal arguments: rounds must be an integer/,
+        ),
+      ])
+        .then(function () {
+          bcrypt.hash("x", 10.5, function (err2, hash2) {
+            assert(err2);
+            assert(!hash2);
+            assert(
+              /Illegal arguments: rounds must be an integer/.test(err2.message),
+            );
+            bcrypt.hash("x", Infinity, function (err3, hash3) {
+              assert(err3);
+              assert(!hash3);
+              assert(
+                /Illegal arguments: rounds must be an integer/.test(
+                  err3.message,
+                ),
+              );
+              done();
+            });
+          });
+        })
+        .catch(function (err) {
+          assert.fail("hash rejection test failed: " + err.message);
+        });
     });
   },
   function compareSync(done) {

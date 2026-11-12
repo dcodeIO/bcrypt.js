@@ -19,6 +19,7 @@ export declare function setRandomFallback(random: RandomFallback): void;
  * Synchronously generates a salt.
  * @param  rounds Number of rounds to use, defaults to 10 if omitted
  * @return Resulting salt
+ * @throws If rounds is not an integer
  * @throws If a random fallback is required but not set
  */
 export declare function genSaltSync(rounds?: number): string;
@@ -27,6 +28,7 @@ export declare function genSaltSync(rounds?: number): string;
  * Asynchronously generates a salt.
  * @param  rounds  Number of rounds to use, defaults to 10 if omitted
  * @return Promise with resulting salt, if callback has been omitted
+ * @rejects If rounds is not an integer
  */
 export declare function genSalt(rounds?: number): Promise<string>;
 

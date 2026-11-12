@@ -82,6 +82,7 @@ export function setRandomFallback(random) {
  * @param {number=} rounds Number of rounds to use, defaults to 10 if omitted
  * @param {number=} seed_length Not supported.
  * @returns {string} Resulting salt
+ * @throws {Error} If rounds is not an integer
  * @throws {Error} If a random fallback is required but not set
  */
 export function genSaltSync(rounds, seed_length) {
@@ -90,6 +91,8 @@ export function genSaltSync(rounds, seed_length) {
     throw Error(
       "Illegal arguments: " + typeof rounds + ", " + typeof seed_length,
     );
+  if (!Number.isInteger(rounds))
+    throw Error("Illegal arguments: rounds must be an integer");
   if (rounds < 4) rounds = 4;
   else if (rounds > 31) rounds = 31;
   var salt = [];
@@ -108,6 +111,7 @@ export function genSaltSync(rounds, seed_length) {
  * @param {function(Error, string=)=} callback Callback receiving the error, if any, and the resulting salt
  * @returns {!Promise} If `callback` has been omitted
  * @throws {Error} If `callback` is present but not a function
+ * @rejects {Error} If rounds is not an integer
  */
 export function genSalt(rounds, seed_length, callback) {
   if (typeof seed_length === "function")
@@ -172,6 +176,10 @@ export function hash(password, salt, callback, progressCallback) {
   function _async(callback) {
     if (typeof password === "string" && typeof salt === "number")
       genSalt(salt, function (err, salt) {
+        if (err) {
+          callback(err);
+          return;
+        }
         _hash(password, salt, callback, progressCallback);
       });
     else if (typeof password === "string" && typeof salt === "string")
